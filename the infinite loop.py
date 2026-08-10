@@ -1,5 +1,6 @@
 import os
 import time
+import random
 
 def limpar():
     os.system("clear" if os.name != "nt" else "cls")
@@ -26,7 +27,7 @@ def obter_nickname(): # Pega o nick do usuário
         
             print(f"""
 Olá, aventureiro(a) {nick}! Bem-vindo ao THE INFINITE LOOP!
-Este é um RPG de texto focado em uma temática medieval, com criaturas, magias e espadas,
+Este é um RPG de texto focado em uma temática medieval, com criaturas, magias e- espadas,
 estimulando sua criatividade ao decorrer da história.
 O jogo pode conter alguns erros, então leve isso em consideração.
 Esperamos que se divirta jogando o nosso text-based RPG!
@@ -175,9 +176,10 @@ def exibir_inventario():
     retirar_item_inv()
 
 
-def exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase):
+def exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,raca_usuario,fome,ouro,peso,xp,nivel,armadura):
     print(f"""              
-            - STATUS DE {nome_usuario.upper()} -
+            Nome:..........{nome_usuario}
+            Raca:..........{raca_usuario}
             Fase:..........{fase}/100
             Vida:..........{vida}
             Fome:..........{fome}/100
@@ -786,54 +788,256 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
 # FASESSS
 def exibirtxt(fase):
 
-    if fase == 1:
-        print(" ")
+    monstro_sorteado="nenhum"
 
+    if fase == 1:
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 1 -=-=-=-=-=-=-=-""")
+        print("""
+Você abre os olhos. Está em uma clareira úmida, cercada por vegetação densa.
+Ao norte, você vê uma trilha, parece ser sua única opção.
+Por algum motivo, ela é muito familiar.
+""")
     if fase == 2:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 2 -=-=-=-=-=-=-=-""")
+
+        lobo= """
+Passando pela entrada da trilha, você percebe o quão grande ela é.
+Sons de pássaros, do vento e das folhas formam um barulho aconchegante.
+Vem um sentimento estranho, você já viveu aquilo.
+Perdido em seus pensamentos, você escuta um barulho de galhos quebrando à sua esquerda.
+Da profunda e escura floresta ergue-se um Lobo Solitário. Seu rosto entrega a fome.
+"""
+        slime="""
+Passando pela entrada da trilha, você percebe o quão grande ela é.
+Sons de pássaros, do vento e das folhas formam um barulho aconchegante.
+Vem um sentimento estranho, você já viveu aquilo.
+Perdido em seus pensamentos, você escuta um barulho de galhos quebrando à sua esquerda.
+Da profunda e escura floresta ergue-se um Slime Verde. Pronto para reabastecer suas energias com carne fresca.
+        """
+
+        opcoes=[lobo,slime]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==lobo:
+            monstro_sorteado="lobo_solitario"
+        else:
+            monstro_sorteado="slime_verde"
+        print(texto_sorteado)
+        return monstro_sorteado
 
     if fase == 3:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 3 -=-=-=-=-=-=-=-""")
 
+        arbusto="""
+Seguindo a trilha cansado, você encontra um arbusto de bagas.
+Aquela cor carmim faz você comer sem pensar duas vezes.
+"""
+
+        pegadas="""
+Seguindo a trilha cansado, você olha para o chão e encontra pegadas suspeitas.
+"""
+        opcoes=[arbusto,pegadas]
+        texto_sorteado=random.choice(opcoes)
+        print(texto_sorteado)
+        
     if fase == 4:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 4 -=-=-=-=-=-=-=-""")
+
+        rato= """
+Seguindo em frente, a trilha não parece ter fim.
+Ao longe, você vê grandes pedras.
+Se aproximando, um Rato Gigante pula em sua direção,
+determinado a arrancar um pedaço seu para alimentar seus filhotes.
+"""
+        goblin="""
+Seguindo em frente, a trilha não parece ter fim.
+Ao longe, você vê grandes pedras. Se aproximando, um Goblin Saqueador.
+Dentes afiados e uma pequena lança de madeira nas mãos,
+ele está pronto para extorquir um novato por aquelas bandas.
+        """
+
+        opcoes=[rato,goblin]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==goblin:
+            monstro_sorteado="gonlin_saqueador"
+        else:
+            monstro_sorteado="rato_gigante"
+        print(texto_sorteado)
+        return monstro_sorteado
+
 
     if fase == 5:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 5 -=-=-=-=-=-=-=-""")
+        print("""
+Exausto, você segue adiante. Você vê uma grande luz e sente esperança de ser o final daquela maldita trilha.
+Mas, se aproximando, percebe que é uma fogueira.
+Cauteloso, você se aproxima e encontra uma barraquinha.
+Seu Otto, um vendedor. O rosto dele é familiar, mas você ainda não sabe o porquê.
+
+-Olá, aventureiro(a)! Que alegria ver alguém por aqui. Deseja comprar alguma coisa? 
+""")
 
     if fase == 6:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 6 -=-=-=-=-=-=-=-""")
+        print("""
+Você estranhamente reconhece o Otto, lembra da sua voz, cheiro, rosto e até do seu sotaque puxado.
+Com medo, você decide ignorar isso. Intrigado, você não percebe um grande laço no chão, uma armadilha de laço.
+Como você pode cair nisso?
+ """)
 
     if fase == 7:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 7 -=-=-=-=-=-=-=-""")
+        goblin= """
+Você escuta um ronco. Olha para a frente e vê um goblin com o escudo caído no chão
+Ao se aproximar, ele acorda de repente e dá um pulo na sua direção.
+Aquela cara verde e suja te causa um desconforto absurdo.
+"""
+        aranha="""
+Lentamente, uma aranha gigantesca desce da escura copa das árvores.
+Você tem certeza de que uma única picada dela te levaria direto ao purgatório.
+        """
+
+        opcoes=[aranha,goblin]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==goblin:
+            monstro_sorteado="goblin_guerreiro"
+        else:
+            monstro_sorteado="aranha"
+        print(texto_sorteado)
+        return monstro_sorteado
 
     if fase == 8:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 8 -=-=-=-=-=-=-=-""")
+        print("""
+Embaixo de um carvalho antigo, você avista um pequeno baú de madeira.
+Com medo, se aproxima em silêncio. O baú não se mexe e parece estar trancado.
+Sua sorte é que a madeira, por causa da umidade, já está apodrecendo.
+""")
 
     if fase == 9:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 9 -=-=-=-=-=-=-=-""")        
+        print("""
+Uma névoa mágica densa cobre a trilha
+e o som da floresta silencia.
+""")
 
     if fase == 10:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 10 -=-=-=-=-=-=-=-""")     
+        print("""
+Uma luz! Você vê uma luz no final da trilha.
+Ao se aproximar, ela some de repente.
+Uma sombra gigantesca surge na sua frente um urso que parece ser feito de pedra.
+Você tem um mau pressentimento do que pode acontecer com você...
+ """)
 
     if fase == 11:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 11 -=-=-=-=-=-=-=-""")    
+        print("""
+Finalmente você sai desta maldita trilha escura e úmida. Suas narinas se aliviam e deixam de sentir aquele cheiro de carniça.
+Pela primeira vez em muito tempo, você vê o céu, escuta os pássaros e sente a brisa fresca do vento batendo em seu rosto.
+À frente, avista uma fonte de água cristalina que parece extremamente convidativa.
+Sem hesitar, você se aproxima e bebe daquela água.
+ 
+Sua vida e mana é completamente restaurada.
+""")
 
     if fase == 12:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 12 -=-=-=-=-=-=-=-""")
+        print("""
+A floresta termina de forma abrupta.
+O chão coberto de folhas e musgo dá lugar a pedras úmidas e frias.
+Diante de você se abre a boca de uma Caverna Escura, como se a própria terra tivesse sido rasgada.
+Do interior sobe um ar gelado e pesado, carregado de um cheiro antigo de umidade, terra e algo quase metálico.
+A entrada nao é nada convidativa, e a escuridão lá dentro é tão densa que a luz do dia parece parar na entrada, como se tivesse medo de entrar.
+Você está de pé na divisa entre a floresta e a escuridão.
+ """)
 
     if fase == 13:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 13 -=-=-=-=-=-=-=-""")
+        print(""" 
+O ar fica imediatamente frio e úmido assim que você cruza a entrada.
+Na parede à sua direita, ainda na soleira da caverna, há uma tocha cravada em um suporte de ferro enferrujado.
+A chama treme, mas continua viva. Você a pega. A madeira está úmida, mas o fogo resiste.
+Com a tocha na mão, a escuridão recua alguns metros.
+À sua frente se abre um túnel estreito de pedra bruta, as paredes irregulares e cobertas de musgo escuro.
+O chão desce levemente, e o som dos seus passos ecoa abafado.
+""")
 
     if fase == 14:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 14 -=-=-=-=-=-=-=-""")
+        morcego= """
+Do fundo escuro da caverna, você escuta o bater rápido de asas… e então um guincho agudo corta o silêncio.
+O som é tão perto e tão repentino que você tropeça e cai no chão de pedra.
+No mesmo instante, um morcego passa rente à sua cabeça, quase raspando o cabelo.
+O vento das asas geladas bate em seu rosto. Você se levanta depressa e olha para trás.
+A criatura paira por um segundo na penumbra da tocha.
+Seus olhos vermelhos brilham e a boca se abre, revelando dentes longos, finos e afiados… feitos, sem dúvida, para perfurar e sugar sangue.
+"""
+        goblin="""
+Com a tocha na mão, a escuridão recua alguns metros.
+Você escuta batidas ritmadas na rocha vindas do fundo da caverna.
+O barulho se aproxima rapidamente.
+Da escuridão surge uma figura baixa e agitada. É um goblin.
+Ele carrega uma picareta pequena, proporcional ao seu corpo magro, e uma lamparina de óleo que balança violentamente na mão.
+Seus olhos amarelados se arregalam ao te ver.
+Por um segundo ele trava… depois grita algo incompreensível e começa a correr na sua direção, com sua picareta erguida.
+        """
+
+        opcoes=[morcego,goblin]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==goblin:
+            monstro_sorteado="gonlin_minerador"
+        else:
+            monstro_sorteado="morcego"
+        print(texto_sorteado)
+        return monstro_sorteado
 
     if fase == 15:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 15 -=-=-=-=-=-=-=-""")
+        print(""" 
+Andando rápido, você pisa em algo que cede sob o pé uma placa de pressão.
+Só percebe o que aconteceu quando sente uma agulhada forte no peito. Um dardo está fincado ali.
+Rápido você o arranca. Da ponta escorre um líquido verde e viscoso.
+Você sofre 20 de dano e agora está envenenado.
+""")
 
     if fase == 16:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 16 -=-=-=-=-=-=-=-""")
+        esqueleto= """
+Ainda com uma dor muito forte do veneno no peito, você avança.
+Escuta um zunido e uma flecha passa rasgando seu braço.
+Foi um corte leve, mas a dor é ardente.
+À sua frente, um esqueleto com arco e flecha mira em sua direção.
+"""
+        larva="""
+Ainda com uma dor muito forte do veneno no peito, você avança.
+Sente um pequeno tremor e, do chão, uma larva com dentes enormes emerge.
+Incrivelmente, ela é extremamente ágil no solo parece que está nadando pela terra.
+        """
 
+        opcoes=[larva,esqueleto]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==esqueleto:
+            monstro_sorteado="esqueleto_armado"
+        else:
+            monstro_sorteado="larva_escavadora"
+        print(texto_sorteado)
+        return monstro_sorteado
     if fase == 17:
         print(" ")
 
@@ -936,28 +1140,30 @@ def exibirtxt(fase):
     if fase == 50:
         print(" ")
      
-def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items_no_inv,fase): # Inicia o jogo 
+def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items_no_inv,fase,fome,ouro,peso,xp,nivel,armadura): # Inicia o jogo 
     limpar()
     inicio_sessao = time.time() 
     
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
-    print("Você acorda em uma floresta escura...")
     while True:
+        exibirtxt(fase)
         entrada = input("-> ").strip().lower()
 
         if entrada == "/inv":
+            limpar()
             exibir_inventario()
 
         elif entrada == "1" or entrada== "2":
+            limpar()
             fase+=1
 
         elif entrada == "a":
             print(fase)
 
         elif entrada == "/help":
+            limpar()
             exibir_help()
-        elif entrada =="/raca":
-             exibir_raca(raca_personagem)
+
 
         elif entrada == "/sair":
             fim_sessao = time.time()
@@ -979,27 +1185,31 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
             break
             
         elif entrada == "/devs":
+           limpar()
            exibir_devs()
 
         elif entrada == "/renick" and nome_usuario is not None:
-                    nome_usuario = trocar_nickname(nome_usuario) 
+            limpar()
+            nome_usuario = trocar_nickname(nome_usuario) 
 
         elif entrada == "/clear":
+            limpar()
             os.system('cls' if os.name == 'nt' else 'clear')
 
-        elif entrada == "/nick":
-            print(f"Seu nick atual é: {nome_usuario}")    
-
         elif entrada == "/sts":
-            exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase)
+            limpar()
+            exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,raca_personagem,fome,ouro,peso,xp,nivel,armadura)
 
         elif entrada == "/start":
+            limpar()
             print('Você não pode usar o comando "/start", o jogo já iniciou!')
 
         elif entrada=="/tabraca":
+             limpar()
              exibir_tabeal_raca()
 
         else:
+            limpar()
             print("Comando inválido! Digite /help para ver a lista de comandos.")
     return fase
 
@@ -1018,7 +1228,7 @@ def main(): # Parte do menu
             nome_usuario = obter_nickname()
             raca_escolhida= obter_raca()
             vida,defesa,velocidade,mana=definir_atributos(raca_escolhida)
-            iniciar_jogo(nome_usuario,raca_escolhida,vida,defesa,velocidade,mana,items_no_inv,fase)
+            iniciar_jogo(nome_usuario,raca_escolhida,vida,defesa,velocidade,mana,items_no_inv,fase,fome,ouro,peso,xp,nivel,armadura)
             break 
             
         elif entrada == "/sair":
@@ -1031,23 +1241,14 @@ def main(): # Parte do menu
         elif entrada == "/renick" and nome_usuario == None:
                     print("Você não pode trocar um nome de usuário inexistente.")
 
-        elif entrada == "/nick" and nome_usuario == None:
-                    print("Você ainda não tem um nome de usuário.")
-
         elif entrada == "/clear":
             print('Você não pode usar o comando "/clear" no menu.')
-
-        elif entrada == "/nick":
-            print('Você ainda não tem um nick.')
 
         elif entrada == "/inv":
             print('Você não pode usar o comando "/inv" no menu.')
 
         elif entrada == "/sts":
             print('Você não pode usar o comando "/sts" no menu.')
-
-        elif entrada == "/raca":
-            print('Você não pode usar o comando "/raca" no menu.')
 
         elif entrada=="/tabraca":
              exibir_tabeal_raca()
