@@ -1039,16 +1039,69 @@ Incrivelmente, ela é extremamente ágil no solo parece que está nadando pela t
         print(texto_sorteado)
         return monstro_sorteado
     if fase == 17:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 17 -=-=-=-=-=-=-=-""")
+        print("""
+Você não sabe como sobreviveu até agora.
+Olha para o chão e vê trilhos de carrinhos de mina.
+Mais à frente encontra um pequeno carrinho de mina.
+Apesar do tamanho, ele está cheio de moedas e joias.
+""")
 
-    if fase == 18:
-        print(" ")
+    if fase == 18: # o gol vende minerais e se vc comprar ele te da uns de brinde
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 18 -=-=-=-=-=-=-=-""")
+        print("""
+Encantado com o carrinho, você começa a escutar batidas nas rochas.
+Sabe que pode ser um goblin e se aproxima com cautela.
+Vê um ser pequeno, sujo e barrigudo. Um bom sinal ele não é verde.
+Você fica aliviado, mas mesmo assim ainda com medo. Continua se aproximando.
+Ele te vê e te cumprimenta.
+
+-Olá senhor(a) aventureiro, como pôde chegar até essa velha e abandonada mina? Eu sou Golmer o anão, mas pode me chamar de Gol.
+Precisa de alguma coisa?
+ """)
 
     if fase == 19:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 19 -=-=-=-=-=-=-=-""")
+        necrofago= """
+O medo te domina novamente. Você já viu esse cara antes, mas não sabe onde e nem quando.
+Lembra da voz e da sua característica barba.
+Dominado pela confusão e pelo medo, você sente um cheiro irresistível de carniça.
+Para equivaler a esse cheiro devem ser centenas de corpos em decomposição. É isso que você pensa.
+Alguns metros à sua frente um ser com pele úmida e podre surge. Você julga ser um necrófago.
+Ele te encara e você já sabe o que virá a seguir.
+"""
+        aranha="""
+O medo te domina novamente. Você já viu esse cara antes, mas não sabe onde e nem quando.
+Lembra da voz e da sua característica barba.
+Dominado pela confusão e pelo medo, você vê uma sombra se aproximando, patas, muitas patas.
+Até que a criatura se mostra por completo, uma aranha.
+Nas suas costas centenas de filhotes que incrivelmente são quase da metade do seu tamanho.
+Você tem certeza que uma mãe faria de tudo para proteger seus filhotes.
+        """
+
+        opcoes=[aranha,necrofago]
+        texto_sorteado=random.choice(opcoes)
+        if texto_sorteado==aranha:
+            monstro_sorteado="aranha_das_cavernas"
+        else:
+            monstro_sorteado="necrofago"
+        print(texto_sorteado)
+        return monstro_sorteado
+
 
     if fase == 20:
-        print(" ")
+        print("""
+Você chega a um trecho mais úmido da mina. O ar fica pesado e o chão escorregadio. À sua frente se abre um lago escuro e parado, a superfície quase sem ondas.
+Do outro lado da água uma pequena canoa se aproxima devagar. Dentro dela um ser magro, pálido e agachado rema com movimentos estranhos. Atrás dele estão três baús fechados.
+A canoa para na beira. O bichinho levanta a cabeça e sorri com dentes amarelados.
+“Meu precioso… ah, um aventureiro. Sim, sim. Eu sou Gollum. Gollum.
+A regra é simples, muito simples. Três baús. Só um tem o prêmio. Os outros dois… ruins. Muito ruins.
+Você escolhe um. Só um. Se acertar, leva o que está dentro. Se errar… coisas ruins podem acontecer com você. Coisas bem ruins.
+Então… qual baú você escolhe, hein? O da esquerda, o do meio ou o da direita?
+""")
 
     if fase == 21:
         print(" ")
