@@ -62,10 +62,14 @@ def exibir_help(): # Exibe o comando /help
 /tabraca: Mostra a tabela das racas;
 
 ----------- COMANDOS GAMEPLAY ----------------
-/inv : Mostra o inventário do jogador;
-/nick: Mostra o nick atual do jogador;
-/sts : Mostra os status do jogador;
-/raca: Mostra a raca do jogador;
+/inv      : Mostra o inventário do jogador;
+/nick     : Mostra o nick atual do jogador;
+/sts      : Mostra os status do jogador;
+/raca     : Mostra a raca do jogador;
+/consumir : Consome um item do inventário (ex: /consumir maca_crocante);
+/fabricar : Fabrica um item na mão, se tiver os materiais (ex: /fabricar corda);
+/buscar   : Mostra os itens do inventário de um tipo (ex: /buscar alimento);
+/ordenar  : Ordena o inventário por tipo, valor ou peso (ex: /ordenar valor_item);
 
 """)
 
@@ -123,17 +127,16 @@ def obter_raca():
 xp = 0 # Dá para fazer um sistema em que a cada 100 de xp ele reseta e ganha um nível, ganhando mais atributos
 nivel = 0
 fase=1
-inventario = {'item_de_exemplo'}
-items_no_inv = len(inventario)
-# Talvez adicionar mais alguma coisa
 
-# Tem que fazer todos os itens do jogo e seus respectivos pesos, ex: (adaga=5) adaga pesa 5 pontos
-item_de_exemplo = 10 
-# Fazendo isso, dá para saber quanto peso o personagem está carregando
+# O inventário agora é um dicionário {chave_do_item: quantidade}, e não mais um set,
+# porque precisamos guardar quantidade de cada item (e buscar os dados dele em itens_jogo())
+inventario = {"espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2}
+items_no_inv = len(inventario)
+
 ouro=0
 fome = 100
 armadura = 0 # A armadura aqui vem do que ele está vestindo
-peso = 0 + item_de_exemplo # Quanto peso o personagem carrega (fiz a soma do item de exemplo só para ver como fica)
+peso = 0 # Agora o peso é calculado a partir do inventário, com calcular_peso_inventario()
 # Atributos que mudam dependendo da raça ↓ 
 
 vida = 0 # 100 é a vida base, dependendo da raça pode aumentar ou diminuir
@@ -142,6 +145,288 @@ defesa = 0
 mana = 0       
 
 
+def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para os itens do jogo
+    # cada item tem: nome_item, tipo_item, valor_item (ouro), peso_item
+    # e dependendo do tipo_item, alguns campos a mais (dano_item, cura_vida_item, fome_item...)
+    # craftavel_item e receita_item só existem se o item puder ser fabricado
+
+    item = {
+        "nome_item": "Nenhum",
+        "tipo_item": "nenhum",
+        "valor_item": 0,
+        "peso_item": 0,
+        "craftavel_item": False
+    }
+
+    # ---------------- ARMAS ----------------
+    if nome_item == "espada_de_madeira":
+        item = {
+            "nome_item": "Espada de Madeira", "tipo_item": "arma",
+            "valor_item": 15, "peso_item": 3, "dano_item": 5,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"madeira_simples": 2}
+        }
+    elif nome_item == "adaga_cega":
+        item = {
+            "nome_item": "Adaga Cega", "tipo_item": "arma",
+            "valor_item": 20, "peso_item": 1, "dano_item": 4,
+            "craftavel_item": False
+        }
+    elif nome_item == "espada_de_ferro":
+        item = {
+            "nome_item": "Espada de Ferro", "tipo_item": "arma",
+            "valor_item": 120, "peso_item": 5, "dano_item": 14,
+            "craftavel_item": True, "local_fabricacao_item": "forja",
+            "receita_item": {"minerio_de_ferro": 2, "carvao": 1}
+        }
+    elif nome_item == "arco_de_caca":
+        item = {
+            "nome_item": "Arco de Caça", "tipo_item": "arma",
+            "valor_item": 50, "peso_item": 2, "dano_item": 8,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"madeira_de_carvalho": 2, "teia_de_aranha": 1}
+        }
+
+    # ---------------- ARMADURAS ----------------
+    elif nome_item == "tunica_de_pano":
+        item = {
+            "nome_item": "Túnica de Pano", "tipo_item": "armadura",
+            "valor_item": 10, "peso_item": 2, "defesa_item": 2,
+            "craftavel_item": False
+        }
+    elif nome_item == "armadura_de_couro":
+        item = {
+            "nome_item": "Armadura de Couro", "tipo_item": "armadura",
+            "valor_item": 60, "peso_item": 6, "defesa_item": 8,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"pele_de_lobo": 2, "teia_de_aranha": 1}
+        }
+    elif nome_item == "escudo_de_madeira":
+        item = {
+            "nome_item": "Escudo de Madeira", "tipo_item": "armadura",
+            "valor_item": 30, "peso_item": 4, "defesa_item": 4,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"madeira_simples": 3}
+        }
+
+    # ---------------- CONSUMÍVEIS ----------------
+    elif nome_item == "pocao_de_cura_pequena":
+        item = {
+            "nome_item": "Poção de Cura Pequena", "tipo_item": "consumivel",
+            "valor_item": 20, "peso_item": 0.5, "cura_vida_item": 30,
+            "craftavel_item": False
+        }
+    elif nome_item == "pocao_de_cura_grande":
+        item = {
+            "nome_item": "Poção de Cura Grande", "tipo_item": "consumivel",
+            "valor_item": 60, "peso_item": 0.5, "cura_vida_item": 80,
+            "craftavel_item": False
+        }
+    elif nome_item == "pocao_de_mana_pequena":
+        item = {
+            "nome_item": "Poção de Mana Pequena", "tipo_item": "consumivel",
+            "valor_item": 25, "peso_item": 0.5, "cura_mana_item": 25,
+            "craftavel_item": False
+        }
+    elif nome_item == "antidoto":
+        item = {
+            "nome_item": "Antídoto", "tipo_item": "consumivel",
+            "valor_item": 30, "peso_item": 0.3, "cura_status_item": "veneno",
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"folha_venenosa": 1, "asa_de_morcego": 1}
+        }
+
+    # ---------------- ALIMENTOS ----------------
+    elif nome_item == "bagas_vermelhas":
+        item = {
+            "nome_item": "Bagas Vermelhas Silvestres", "tipo_item": "alimento",
+            "valor_item": 2, "peso_item": 0.2, "fome_item": 10,
+            "craftavel_item": False
+        }
+    elif nome_item == "carne_crua":
+        item = {
+            "nome_item": "Carne Crua de Caça", "tipo_item": "alimento",
+            "valor_item": 5, "peso_item": 0.5, "fome_item": 15,
+            "craftavel_item": False
+        }
+    elif nome_item == "maca_crocante":
+        item = {
+            "nome_item": "Maçã Crocante", "tipo_item": "alimento",
+            "valor_item": 10, "peso_item": 0.2, "fome_item": 20, "vida_bonus_item": 5,
+            "craftavel_item": False
+        }
+    elif nome_item == "carne_assada":
+        item = {
+            "nome_item": "Carne Assada Suculenta", "tipo_item": "alimento",
+            "valor_item": 20, "peso_item": 0.5, "fome_item": 50,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"carne_crua": 1, "madeira_simples": 1}
+        }
+
+    # ---------------- RECURSOS ----------------
+    elif nome_item == "madeira_simples":
+        item = {
+            "nome_item": "Madeira Simples", "tipo_item": "recurso",
+            "valor_item": 5, "peso_item": 1, "craftavel_item": False
+        }
+    elif nome_item == "madeira_de_carvalho":
+        item = {
+            "nome_item": "Madeira de Carvalho Rígido", "tipo_item": "recurso",
+            "valor_item": 15, "peso_item": 1.5, "craftavel_item": False
+        }
+    elif nome_item == "carvao":
+        item = {
+            "nome_item": "Carvão", "tipo_item": "recurso",
+            "valor_item": 8, "peso_item": 1, "craftavel_item": False
+        }
+    elif nome_item == "minerio_de_ferro":
+        item = {
+            "nome_item": "Minério de Ferro", "tipo_item": "recurso",
+            "valor_item": 20, "peso_item": 2, "craftavel_item": False
+        }
+    elif nome_item == "corda": # item simples, craftavel na mao (pedido de exemplo)
+        item = {
+            "nome_item": "Corda", "tipo_item": "recurso",
+            "valor_item": 6, "peso_item": 0.5,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"teia_de_aranha": 2}
+        }
+
+    # ---------------- DROPS DE MONSTRO ----------------
+    elif nome_item == "gelatina_verde":
+        item = {
+            "nome_item": "Gelatina Verde", "tipo_item": "drop",
+            "valor_item": 5, "peso_item": 0.5, "craftavel_item": False
+        }
+    elif nome_item == "pele_de_lobo":
+        item = {
+            "nome_item": "Pele de Lobo", "tipo_item": "drop",
+            "valor_item": 10, "peso_item": 1, "craftavel_item": False
+        }
+    elif nome_item == "teia_de_aranha":
+        item = {
+            "nome_item": "Teia de Aranha", "tipo_item": "drop",
+            "valor_item": 12, "peso_item": 0.3, "craftavel_item": False
+        }
+    elif nome_item == "folha_venenosa":
+        item = {
+            "nome_item": "Folha Venenosa", "tipo_item": "drop",
+            "valor_item": 30, "peso_item": 0.2, "craftavel_item": False
+        }
+    elif nome_item == "asa_de_morcego":
+        item = {
+            "nome_item": "Asa de Morcego", "tipo_item": "drop",
+            "valor_item": 15, "peso_item": 0.2, "craftavel_item": False
+        }
+
+    # ---------------- INUSITADOS ----------------
+    elif nome_item == "pedra_batata":
+        item = {
+            "nome_item": "Pedra em Formato de Batata", "tipo_item": "inusitado",
+            "valor_item": 2, "peso_item": 1, "craftavel_item": False
+        }
+
+    return item
+
+
+def calcular_peso_inventario(): # Soma o peso_item de cada item do inventário pela quantidade
+    total = 0
+    for nome_item, quantidade in inventario.items():
+        item = itens_jogo(nome_item)
+        total += item["peso_item"] * quantidade
+    return total
+
+
+def pesquisar_item_por_tipo(tipo): # Retorna só os itens do inventário daquele tipo_item
+    encontrados = {}
+    for nome_item, quantidade in inventario.items():
+        item = itens_jogo(nome_item)
+        if item["tipo_item"] == tipo:
+            encontrados[nome_item] = quantidade
+    return encontrados
+
+
+def ordenar_inventario_por(criterio): # criterio: "tipo_item", "valor_item" ou "peso_item"
+    global inventario
+    inventario = dict(
+        sorted(inventario.items(), key=lambda par: itens_jogo(par[0]).get(criterio, ""))
+    )
+
+
+def pode_consumir_item(nome_item):
+    item = itens_jogo(nome_item)
+    return item["tipo_item"] in ("consumivel", "alimento")
+
+
+def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome): # retorna vida, mana, fome e a mensagem
+    item = itens_jogo(nome_item)
+
+    if item["nome_item"] == "Nenhum":
+        return vida, mana, fome, f"O item '{nome_item}' não existe."
+
+    if inventario.get(nome_item, 0) <= 0:
+        return vida, mana, fome, f"Você não possui {nome_item} no inventário."
+
+    if not pode_consumir_item(nome_item):
+        return vida, mana, fome, f"{item['nome_item']} não pode ser consumido."
+
+    efeitos = []
+
+    if item["tipo_item"] == "alimento":
+        fome = min(100, fome + item.get("fome_item", 0))
+        efeitos.append(f"+{item.get('fome_item', 0)} de fome")
+        if "vida_bonus_item" in item:
+            vida = min(vida_maxima, vida + item["vida_bonus_item"])
+            efeitos.append(f"+{item['vida_bonus_item']} de vida")
+
+    elif item["tipo_item"] == "consumivel":
+        if "cura_vida_item" in item:
+            vida = min(vida_maxima, vida + item["cura_vida_item"])
+            efeitos.append(f"+{item['cura_vida_item']} de vida")
+        if "cura_mana_item" in item:
+            mana = min(mana_maxima, mana + item["cura_mana_item"])
+            efeitos.append(f"+{item['cura_mana_item']} de mana")
+        if "cura_status_item" in item:
+            efeitos.append(f"curou status: {item['cura_status_item']}")
+
+    inventario[nome_item] -= 1
+    if inventario[nome_item] <= 0:
+        del inventario[nome_item]
+
+    mensagem = f"Você consumiu {item['nome_item']} e ganhou: " + ", ".join(efeitos) + "."
+    return vida, mana, fome, mensagem
+
+
+def pode_fabricar_item(nome_item, local): # local: "mao" ou "forja"
+    item = itens_jogo(nome_item)
+
+    if item["nome_item"] == "Nenhum" or not item.get("craftavel_item"):
+        return False, f"{nome_item} não pode ser fabricado."
+
+    if item.get("local_fabricacao_item") == "forja" and local != "forja":
+        return False, f"{item['nome_item']} só pode ser fabricado em uma forja."
+
+    for ingrediente, quantidade_necessaria in item.get("receita_item", {}).items():
+        if inventario.get(ingrediente, 0) < quantidade_necessaria:
+            nome_ingrediente = itens_jogo(ingrediente)["nome_item"]
+            return False, f"Faltam materiais: {nome_ingrediente} (precisa de {quantidade_necessaria})."
+
+    return True, "Pode fabricar."
+
+
+def fabricar_item(nome_item, local="mao"):
+    pode, mensagem = pode_fabricar_item(nome_item, local)
+    if not pode:
+        return mensagem
+
+    item = itens_jogo(nome_item)
+    for ingrediente, quantidade in item.get("receita_item", {}).items():
+        inventario[ingrediente] -= quantidade
+        if inventario[ingrediente] <= 0:
+            del inventario[ingrediente]
+
+    inventario[nome_item] = inventario.get(nome_item, 0) + 1
+    return f"Você fabricou: {item['nome_item']}!"
 
 
 def retirar_item_inv():
@@ -153,10 +438,12 @@ def retirar_item_inv():
     """)).strip().lower()
             
         if entrada_inv == "sim":
-            item = str(input("Qual(is) item(s) vc deseja retirar do seu inventario? "))
+            item = str(input("Qual(is) item(s) vc deseja retirar do seu inventario? ")).strip().lower()
             
             if item in inventario:
-                inventario.remove(item)
+                inventario[item] -= 1
+                if inventario[item] <= 0:
+                    del inventario[item]
                 print(f"Seu inventario ficou assim: {inventario}")
             else:
                 print("Esse item não está no seu inventário.")
@@ -170,9 +457,12 @@ def retirar_item_inv():
             
         
 def exibir_inventario():
-    print(f"""
-    Você tem {inventario} no seu inventário.
-    """)
+    print("\n--------- INVENTÁRIO ---------")
+    for nome_item, quantidade in inventario.items():
+        item = itens_jogo(nome_item)
+        print(f"{item['nome_item']:<28} x{quantidade:<3} [{item['tipo_item']}]  {item['valor_item']} ouro  {item['peso_item']} peso")
+    print(f"Peso total: {calcular_peso_inventario()}")
+    print("-------------------------------\n")
     retirar_item_inv()
 
 
@@ -1196,6 +1486,11 @@ Então… qual baú você escolhe, hein? O da esquerda, o do meio ou o da direit
 def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items_no_inv,fase,fome,ouro,peso,xp,nivel,armadura): # Inicia o jogo 
     limpar()
     inicio_sessao = time.time() 
+
+    # vida e mana no momento em que o jogo comeca viram o "maximo" pra poder
+    # limitar quanto os itens de cura conseguem recuperar
+    vida_maxima = vida
+    mana_maxima = mana
     
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
     while True:
@@ -1204,6 +1499,7 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
 
         if entrada == "/inv":
             limpar()
+            items_no_inv = len(inventario)
             exibir_inventario()
 
         elif entrada == "1" or entrada== "2":
@@ -1251,6 +1547,8 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
 
         elif entrada == "/sts":
             limpar()
+            peso = calcular_peso_inventario()
+            items_no_inv = len(inventario)
             exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,raca_personagem,fome,ouro,peso,xp,nivel,armadura)
 
         elif entrada == "/start":
@@ -1260,6 +1558,47 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
         elif entrada=="/tabraca":
              limpar()
              exibir_tabeal_raca()
+
+        elif entrada.startswith("/consumir"):
+            limpar()
+            partes = entrada.split(" ", 1)
+            if len(partes) < 2:
+                print("Use assim: /consumir nome_do_item (ex: /consumir maca_crocante)")
+            else:
+                nome_item = partes[1].strip()
+                vida, mana, fome, mensagem = consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome)
+                print(mensagem)
+
+        elif entrada.startswith("/fabricar"):
+            limpar()
+            partes = entrada.split(" ", 1)
+            if len(partes) < 2:
+                print("Use assim: /fabricar nome_do_item (ex: /fabricar corda)")
+            else:
+                nome_item = partes[1].strip()
+                print(fabricar_item(nome_item, local="mao"))
+
+        elif entrada.startswith("/buscar"):
+            limpar()
+            partes = entrada.split(" ", 1)
+            if len(partes) < 2:
+                print("Use assim: /buscar tipo (ex: /buscar alimento)")
+            else:
+                tipo = partes[1].strip()
+                encontrados = pesquisar_item_por_tipo(tipo)
+                if encontrados:
+                    for nome_item, quantidade in encontrados.items():
+                        item = itens_jogo(nome_item)
+                        print(f"{item['nome_item']} x{quantidade} - {item['valor_item']} ouro - {item['peso_item']} peso")
+                else:
+                    print(f"Nenhum item do tipo '{tipo}' no inventário.")
+
+        elif entrada.startswith("/ordenar"):
+            limpar()
+            partes = entrada.split(" ", 1)
+            criterio = partes[1].strip() if len(partes) > 1 else "tipo_item"
+            ordenar_inventario_por(criterio)
+            print(f"Inventário ordenado por {criterio}.")
 
         else:
             limpar()
