@@ -1,6 +1,7 @@
 import os
 import time
 import random
+import platform
 
 def limpar():
     os.system("clear" if os.name != "nt" else "cls")
@@ -63,9 +64,7 @@ def exibir_help(): # Exibe o comando /help
 
 ----------- COMANDOS GAMEPLAY ----------------
 /inv      : Mostra o inventário do jogador;
-/nick     : Mostra o nick atual do jogador;
 /sts      : Mostra os status do jogador;
-/raca     : Mostra a raca do jogador;
 /consumir : Consome um item do inventário (ex: /consumir maca_crocante);
 /fabricar : Fabrica um item na mão, se tiver os materiais (ex: /fabricar corda);
 /buscar   : Mostra os itens do inventário de um tipo (ex: /buscar alimento);
@@ -345,6 +344,19 @@ def pesquisar_item_por_tipo(tipo): # Retorna só os itens do inventário daquele
             encontrados[nome_item] = quantidade
     return encontrados
 
+def musica():
+    sistema = platform.system()
+
+    if sistema == "Windows":
+        import winsound
+
+        winsound.PlaySound("musica.wav", winsound.SND_FILENAME)
+
+    elif sistema == "Darwin":
+        os.system("afplay musica.wav")
+
+    elif sistema == "Linux":
+        os.system("aplay musica.wav")
 
 def ordenar_inventario_por(criterio): # criterio: "tipo_item", "valor_item" ou "peso_item"
     global inventario
@@ -1384,32 +1396,79 @@ Você tem certeza que uma mãe faria de tudo para proteger seus filhotes.
 
     if fase == 20:
         print("""
+A caverna vai se alargando cada vez mais. Junto a isso, suas paredes começam a se tornar cristalinas.
+Diversos cristais coloridos estão nas paredes. Você viu vários caminhos diferentes e seguiu o que mais te agradou.
+Acho que essa não é a melhor estratégia para sair de uma caverna...
+
+Cada vez mais aparecem mais cristais, até que você vê um cristal posicionado no meio da caverna.
+Ele é extremamente grande. Você se aproxima e um tremor acontece.
+O grande cristal se levanta e se revela como um golem de cristal. Você está de frente com uma montanha viva.
+""")
+
+    if fase == 21:
+        print("""
 Você chega a um trecho mais úmido da mina. O ar fica pesado e o chão escorregadio. À sua frente se abre um lago escuro e parado, a superfície quase sem ondas.
 Do outro lado da água uma pequena canoa se aproxima devagar. Dentro dela um ser magro, pálido e agachado rema com movimentos estranhos. Atrás dele estão três baús fechados.
 A canoa para na beira. O bichinho levanta a cabeça e sorri com dentes amarelados.
-“Meu precioso… ah, um aventureiro. Sim, sim. Eu sou Gollum. Gollum.
+
+-Meu precioso… ah, um aventureiro. Sim, sim. Eu sou Gollum. Gollum.
 A regra é simples, muito simples. Três baús. Só um tem o prêmio. Os outros dois… ruins. Muito ruins.
 Você escolhe um. Só um. Se acertar, leva o que está dentro. Se errar… coisas ruins podem acontecer com você. Coisas bem ruins.
 Então… qual baú você escolhe, hein? O da esquerda, o do meio ou o da direita?
 """)
 
-    if fase == 21:
-        print(" ")
-
     if fase == 22:
-        print(" ")
+        print(""" 
+Passando ao redor do lago, você vê pequenas luzes no teto da caverna.
+Se aproximando, você percebe serem plantas, e melhor que isso, o brilho vinha de pequenas frutinhas,
+bagas brilhantes, uma iguaria considerando sua localização.
+""")
 
     if fase == 23:
-        print(" ")
+        print("""
+Logo à frente das bagas brilhantes, você vê um altar de pedra.
+Ao se aproximar, uma vontade extrema de se ajoelhar sobre ele te consome.
+Você não sabe o porquê, mas parece que já viu aquele altar e já sentiu a mesma sensação.
+ """)
 
     if fase == 24:
-        print(" ")
+        print("""
+Uma curva brusca na ravina revela uma luz roxa.
+Você vê uma fumaça roxa, luzes e um cheiro encantador saindo de um buraco roxo no chão.
+Você julga ser um portal. Conforme você se aproxima, o portal reage.
+Algo muito estranho pelo seu ponto de vista.
+ """)
 
     if fase == 25:
-        print(" ")
+        print(""""
+Após entrar, você se sente no espaço. Você começa a flutuar nunca sentiu uma sensação tão boa quanto essa.
+Lentamente, você nada pelo ar em um lugar totalmente preto.
+Você sente muita mana ao seu redor e... lentamente... você começa a se lembrar...
+você já viveu tudo isso... você se lembra, lembra com certeza... 
+agora faz sentido você ter lembrado do rosto de Otto e de outros.
+Você já viveu isso, você lembra, mas... você não sabe o porquê está vivendo isso novamente.
+Agora paredes se formam ao seu redor e você cai em um salão de pedras. 
+Esse salão está flutuando, você tem essa impressão.
+Pelas pequeninas janelinhas você só vê preto e nada mais.
+O ar cheira a mofo e sente uma mana absurda fluindo de todos os lugares... 
+""")
 
     if fase == 26:
-        print(" ")
+        print(""" 
+Paralisado enquanto pensativo, uma grande porta de madeira escura abre lentamente à sua frente.
+Um homem com capuz entra na sala, mas ele não te vê.
+Passando todo o seu corpo para dentro da sala, ele finalmente percebe sua presença. Ele te olha fixamente.
+
+— Forasteiro!!
+
+Em seguida você escuta as palavras saírem da sua boca...
+
+— Que a grande proteção do fogo esteja no lugar que tu buscas. Eu chamo o calor ousado de uma tocha aqui e agora. Bola de Fogo!
+
+Uma bola de fogo surge na frente do homem.
+Agora você sabe, ele é um cultista.
+A bola de fogo é disparada na sua direção e se aproxima surpreendente rápido...
+""")
 
     if fase == 27:
         print(" ")
@@ -1606,6 +1665,7 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
     return fase
 
 def main(): # Parte do menu
+    musica()
     limpar()
     menu()
     
