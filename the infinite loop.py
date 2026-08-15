@@ -1396,6 +1396,7 @@ Você tem certeza que uma mãe faria de tudo para proteger seus filhotes.
 
     if fase == 20:
         print("""
+<<<<<<< Updated upstream
 A caverna vai se alargando cada vez mais. Junto a isso, suas paredes começam a se tornar cristalinas.
 Diversos cristais coloridos estão nas paredes. Você viu vários caminhos diferentes e seguiu o que mais te agradou.
 Acho que essa não é a melhor estratégia para sair de uma caverna...
@@ -1406,6 +1407,9 @@ O grande cristal se levanta e se revela como um golem de cristal. Você está de
 """)
 
     if fase == 21:
+=======
+        =-=-=-=-=-=-=-=-=- FASE 20 -=-=-=-=-=-=-=-""")
+>>>>>>> Stashed changes
         print("""
 Você chega a um trecho mais úmido da mina. O ar fica pesado e o chão escorregadio. À sua frente se abre um lago escuro e parado, a superfície quase sem ondas.
 Do outro lado da água uma pequena canoa se aproxima devagar. Dentro dela um ser magro, pálido e agachado rema com movimentos estranhos. Atrás dele estão três baús fechados.
