@@ -527,147 +527,93 @@ def exibir_tabeal_raca():
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
            """)
 
-def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo de lista, mais facil para fazer um return de varias coisas
-         
+def monstros(entrada_monstro):
+
     monstro = {
-        "Nome_monstro":"Nenhum",
-        "vida_monstro":0,
-        "dano_monstro":0,
-        "velocidade_monstro":0,
-        "defesa_monstro":0,
-        "xp_monstro":0,
-        "drop_moeda":0,
-        "drops_100%_monstro":[]
+        "nome_monstro": "Nenhum",
+        "vida_monstro": 0,
+        "dano_monstro": 0,
+        "velocidade_monstro": 0,
+        "defesa_monstro": 0,
+        "xp_monstro": 0,
+        "drop_moeda": 0,
+        "drops_100%_monstro": []
     }
 
-    # ato 1 floresta dos susuros fases 1 a 12 ↓
+    #ATO 1 - FLORESTA
 
-    if entrada_monstro=="slime_verde":
-        monstro= {
-            "nome_monstro":"Slime Verde",
-            "vida_monstro":30,
-            "dano_monstro":5,
-            "velocidade_monstro":8,
-            "defesa_monstro":2,
-            "xp_montro":25,
-            "drop_moeda":5,
-            "drops_100%_monstro":[]
-        }
-
-    elif entrada_monstro=="lobo_solitario":
+    if entrada_monstro == "slime_verde":
         monstro = {
-            "nome_monstro":"Lobo Solitario",
-            "vida_monstro":45,
-            "dano_monstro":10,
-            "velocidade_monstro":22,
-            "defesa_monstro":4,
-            "xp_monstro":35,
-            "drop_moeda":10,
-            "drops_100%_monstro":[]
+            "nome_monstro": "Slime Verde",
+            "vida_monstro": 30,
+            "dano_monstro": 5,
+            "velocidade_monstro": 8,
+            "defesa_monstro": 2,
+            "xp_monstro": 25,
+            "drop_moeda": 5,
+            "drops_100%_monstro": ["gelatina_verde"]
         }
 
-    elif entrada_monstro=="goblin_sequestrador":
+    elif entrada_monstro == "lobo_solitario":
         monstro = {
-            "nome_monstro":"Goblin Sequestrador",
-            "vida_mostro":40,
-            "dano_monstro":8,
-            "velocidade_montro":18,
-            "defesa_monstro":5,
-            "xp_montro":30,
-            "drop_moeda":15,
-            "drops_100%_monstro":[]
+            "nome_monstro": "Lobo Solitário",
+            "vida_monstro": 45,
+            "dano_monstro": 10,
+            "velocidade_monstro": 22,
+            "defesa_monstro": 4,
+            "xp_monstro": 35,
+            "drop_moeda": 10,
+            "drops_100%_monstro": ["pele_de_lobo"]
         }
 
-    elif entrada_monstro=="rato_gigante":
-        monstro = {    
-            "nome_monstro":"Rato Gigante",
-            "vida_mostro":35,
-            "dano_monstro":7,
-            "velocidade_montro":20,
-            "defesa_monstro":3,
-            "xp_montro":25,
-            "drop_moeda":8,
-            "drops_100%_monstro":[]
-        } 
+    elif entrada_monstro == "rato_gigante":
+        monstro = {
+            "nome_monstro": "Rato Gigante",
+            "vida_monstro": 35,
+            "dano_monstro": 7,
+            "velocidade_monstro": 20,
+            "defesa_monstro": 3,
+            "xp_monstro": 25,
+            "drop_moeda": 8,
+            "drops_100%_monstro": []
+        }
 
-    elif entrada_monstro=="":
-        monstro = {    
-            "nome_monstro":"Aranha Caçadora",
-            "vida_mostro":50,
-            "dano_monstro":12,
-            "velocidade_montro":24,
-            "defesa_monstro":6,
-            "xp_montro":40,
-            "drop_moeda":18,
-            "drops_100%_monstro":[]
-        } 
+    elif entrada_monstro == "goblin_saqueador":
+        monstro = {
+            "nome_monstro": "Goblin Saqueador",
+            "vida_monstro": 40,
+            "dano_monstro": 8,
+            "velocidade_monstro": 18,
+            "defesa_monstro": 5,
+            "xp_monstro": 30,
+            "drop_moeda": 15,
+            "drops_100%_monstro": []
+        }
 
     elif entrada_monstro == "goblin_guerreiro":
-            monstro = {
-                "nome_monstro": "Goblin Guerreiro",
-                "vida_monstro": 60,
-                "dano_monstro": 14,
-                "velocidade_monstro": 15,
-                "defesa_monstro": 12,
-                "xp_monstro": 50,
-                "drop_moeda": 25,
-                "drops_100_monstro": []
-            }
-    elif entrada_monstro == "javali_enfurecido":
         monstro = {
-            "nome_monstro": "Javali Enfurecido",
-            "vida_monstro": 70,
-            "dano_monstro": 16,
-            "velocidade_monstro": 18,
-            "defesa_monstro": 8,
-            "xp_monstro": 55,
-            "drop_moeda": 20,
-            "drops_100_monstro": []
+            "nome_monstro": "Goblin Guerreiro",
+            "vida_monstro": 60,
+            "dano_monstro": 14,
+            "velocidade_monstro": 15,
+            "defesa_monstro": 12,
+            "xp_monstro": 50,
+            "drop_moeda": 25,
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "planta_carnivora":
+
+    elif entrada_monstro == "aranha":
         monstro = {
-            "nome_monstro": "Planta Carnívora",
-            "vida_monstro": 80,
-            "dano_monstro": 15,
-            "velocidade_monstro": 10,
-            "defesa_monstro": 10,
-            "xp_monstro": 60,
-            "drop_moeda": 30,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "esqueleto_errante":
-        monstro = {
-            "nome_monstro": "Esqueleto Errante",
-            "vida_monstro": 55,
-            "dano_monstro": 11,
-            "velocidade_monstro": 12,
-            "defesa_monstro": 10,
-            "xp_monstro": 45,
-            "drop_moeda": 12,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "kobold_espiao":
-        monstro = {
-            "nome_monstro": "Kobold Espião",
-            "vida_monstro": 45,
-            "dano_monstro": 9,
-            "velocidade_monstro": 26,
-            "defesa_monstro": 5,
+            "nome_monstro": "Aranha Gigante",
+            "vida_monstro": 50,
+            "dano_monstro": 12,
+            "velocidade_monstro": 24,
+            "defesa_monstro": 6,
             "xp_monstro": 40,
-            "drop_moeda": 22,
-            "drops_100_monstro": []
+            "drop_moeda": 18,
+            "drops_100%_monstro": ["teia_de_aranha"]
         }
-    elif entrada_monstro == "ent_menor":
-        monstro = {
-            "nome_monstro": "Ent Menor",
-            "vida_monstro": 90,
-            "dano_monstro": 13,
-            "velocidade_monstro": 8,
-            "defesa_monstro": 18,
-            "xp_monstro": 70,
-            "drop_moeda": 28,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "urso_de_pedra":
         monstro = {
             "nome_monstro": "Urso de Pedra",
@@ -677,12 +623,11 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 25,
             "xp_monstro": 200,
             "drop_moeda": 80,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
 
-    #ato 2 as minas esquecidas fases 13 a 25 ↓
-
-    elif entrada_monstro == "morcego_vampiro":
+    #ATO 2 - MINAS 
+    elif entrada_monstro == "morcego":
         monstro = {
             "nome_monstro": "Morcego Vampiro",
             "vida_monstro": 50,
@@ -691,8 +636,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 4,
             "xp_monstro": 50,
             "drop_moeda": 15,
-            "drops_100_monstro": []
+            "drops_100%_monstro": ["asa_de_morcego"]
         }
+
     elif entrada_monstro == "goblin_minerador":
         monstro = {
             "nome_monstro": "Goblin Minerador",
@@ -702,19 +648,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 10,
             "xp_monstro": 65,
             "drop_moeda": 35,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "larva_escavadora":
-        monstro = {
-            "nome_monstro": "Larva Escavadora",
-            "vida_monstro": 75,
-            "dano_monstro": 14,
-            "velocidade_monstro": 10,
-            "defesa_monstro": 15,
-            "xp_monstro": 60,
-            "drop_moeda": 20,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "esqueleto_armado":
         monstro = {
             "nome_monstro": "Esqueleto Armado",
@@ -724,8 +660,21 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 18,
             "xp_monstro": 75,
             "drop_moeda": 30,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
+
+    elif entrada_monstro == "larva_escavadora":
+        monstro = {
+            "nome_monstro": "Larva Escavadora",
+            "vida_monstro": 75,
+            "dano_monstro": 14,
+            "velocidade_monstro": 10,
+            "defesa_monstro": 15,
+            "xp_monstro": 60,
+            "drop_moeda": 20,
+            "drops_100%_monstro": []
+        }
+
     elif entrada_monstro == "necrofago":
         monstro = {
             "nome_monstro": "Necrófago",
@@ -735,8 +684,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 12,
             "xp_monstro": 80,
             "drop_moeda": 32,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
+
     elif entrada_monstro == "aranha_das_cavernas":
         monstro = {
             "nome_monstro": "Aranha das Cavernas",
@@ -746,74 +696,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 10,
             "xp_monstro": 70,
             "drop_moeda": 28,
-            "drops_100_monstro": []
+            "drops_100%_monstro": ["teia_de_aranha"]
         }
-    elif entrada_monstro == "gargula_de_pedra":
-        monstro = {
-            "nome_monstro": "Gárgula de Pedra",
-            "vida_monstro": 110,
-            "dano_monstro": 16,
-            "velocidade_monstro": 12,
-            "defesa_monstro": 28,
-            "xp_monstro": 90,
-            "drop_moeda": 40,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "zumbi_de_mina":
-        monstro = {
-            "nome_monstro": "Zumbi de Mina",
-            "vida_monstro": 120,
-            "dano_monstro": 15,
-            "velocidade_monstro": 6,
-            "defesa_monstro": 8,
-            "xp_monstro": 85,
-            "drop_moeda": 25,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "espectro_de_minerio":
-        monstro = {
-            "nome_monstro": "Espectro de Minério",
-            "vida_monstro": 95,
-            "dano_monstro": 22,
-            "velocidade_monstro": 22,
-            "defesa_monstro": 14,
-            "xp_monstro": 95,
-            "drop_moeda": 45,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "cobra_cuspideira":
-        monstro = {
-            "nome_monstro": "Cobra Cuspideira",
-            "vida_monstro": 70,
-            "dano_monstro": 19,
-            "velocidade_monstro": 24,
-            "defesa_monstro": 8,
-            "xp_monstro": 75,
-            "drop_moeda": 30,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "troll_das_cavernas":
-        monstro = {
-            "nome_monstro": "Troll das Cavernas",
-            "vida_monstro": 160,
-            "dano_monstro": 26,
-            "velocidade_monstro": 10,
-            "defesa_monstro": 20,
-            "xp_monstro": 130,
-            "drop_moeda": 60,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "basilisco_jovem":
-        monstro = {
-            "nome_monstro": "Basilisco Jovem",
-            "vida_monstro": 130,
-            "dano_monstro": 24,
-            "velocidade_monstro": 20,
-            "defesa_monstro": 22,
-            "xp_monstro": 110,
-            "drop_moeda": 55,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "golem_de_cristal":
         monstro = {
             "nome_monstro": "Golem de Cristal",
@@ -823,55 +708,22 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 38,
             "xp_monstro": 350,
             "drop_moeda": 150,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
- 
-    #ato 3 as ruinas arcanas 26 a 37 ↓
 
-    elif entrada_monstro == "constructo_magico":
+    #ATO 3 - RUÍNAS ARCANAS
+    elif entrada_monstro == "elemental_de_fogo":
         monstro = {
-            "nome_monstro": "Constructo Mágico",
-            "vida_monstro": 130,
-            "dano_monstro": 22,
-            "velocidade_monstro": 14,
-            "defesa_monstro": 25,
-            "xp_monstro": 120,
-            "drop_moeda": 50,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "cultista_novato":
-        monstro = {
-            "nome_monstro": "Cultista Novato",
-            "vida_monstro": 100,
-            "dano_monstro": 26,
-            "velocidade_monstro": 18,
-            "defesa_monstro": 12,
-            "xp_monstro": 110,
-            "drop_moeda": 45,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "elementar_de_fogo":
-        monstro = {
-            "nome_monstro": "Elementar de Fogo",
+            "nome_monstro": "Elemental de Fogo",
             "vida_monstro": 120,
             "dano_monstro": 30,
             "velocidade_monstro": 22,
             "defesa_monstro": 15,
             "xp_monstro": 135,
             "drop_moeda": 55,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "elementar_de_gelo":
-        monstro = {
-            "nome_monstro": "Elementar de Gelo",
-            "vida_monstro": 140,
-            "dano_monstro": 22,
-            "velocidade_monstro": 16,
-            "defesa_monstro": 24,
-            "xp_monstro": 135,
-            "drop_moeda": 55,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "lamina_vazia":
         monstro = {
             "nome_monstro": "Lâmina Vazia",
@@ -881,8 +733,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 10,
             "xp_monstro": 125,
             "drop_moeda": 40,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
+
     elif entrada_monstro == "mago_renegado":
         monstro = {
             "nome_monstro": "Mago Renegado",
@@ -892,65 +745,22 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 14,
             "xp_monstro": 140,
             "drop_moeda": 60,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "cavaleiro_espectral":
-        monstro = {
-            "nome_monstro": "Cavaleiro Espectral",
-            "vida_monstro": 160,
-            "dano_monstro": 34,
-            "velocidade_monstro": 18,
-            "defesa_monstro": 30,
-            "xp_monstro": 160,
-            "drop_moeda": 70,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "sombra_faminta":
-        monstro = {
-            "nome_monstro": "Sombra Faminta",
-            "vida_monstro": 105,
-            "dano_monstro": 35,
-            "velocidade_monstro": 30,
-            "defesa_monstro": 8,
-            "xp_monstro": 130,
-            "drop_moeda": 50,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "gorgona_mistica":
-        monstro = {
-            "nome_monstro": "Górgona Mística",
-            "vida_monstro": 170,
-            "dano_monstro": 32,
-            "velocidade_monstro": 25,
-            "defesa_monstro": 22,
-            "xp_monstro": 175,
-            "drop_moeda": 85,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "quimera_arcana":
-        monstro = {
-            "nome_monstro": "Quimera Arcana",
-            "vida_monstro": 210,
-            "dano_monstro": 38,
-            "velocidade_monstro": 22,
-            "defesa_monstro": 26,
-            "xp_monstro": 210,
-            "drop_moeda": 100,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "mago_corrompido":
-        monstro = {
-            "nome_monstro": "Mago Corrompido",
-            "vida_monstro": 350,
-            "dano_monstro": 45,
-            "velocidade_monstro": 24,
-            "defesa_monstro": 20,
-            "xp_monstro": 500,
-            "drop_moeda": 250,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
 
-    # ato 4 a cidade do caos 38 a 50 ↓
+    elif entrada_monstro == "elemental_de_gelo":
+        monstro = {
+            "nome_monstro": "Elemental de Gelo",
+            "vida_monstro": 140,
+            "dano_monstro": 22,
+            "velocidade_monstro": 16,
+            "defesa_monstro": 24,
+            "xp_monstro": 135,
+            "drop_moeda": 55,
+            "drops_100%_monstro": []
+        }
+
+    #ATO 4 - CASTELLO 
 
     elif entrada_monstro == "guarda_de_ferro":
         monstro = {
@@ -961,19 +771,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 42,
             "xp_monstro": 220,
             "drop_moeda": 80,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "sabujo_do_caos":
-        monstro = {
-            "nome_monstro": "Sabujo do Caos",
-            "vida_monstro": 160,
-            "dano_monstro": 42,
-            "velocidade_monstro": 35,
-            "defesa_monstro": 18,
-            "xp_monstro": 200,
-            "drop_moeda": 75,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "cavaleiro_negro":
         monstro = {
             "nome_monstro": "Cavaleiro Negro",
@@ -983,19 +783,21 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 38,
             "xp_monstro": 260,
             "drop_moeda": 110,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "algoz_do_caos":
+
+    elif entrada_monstro == "dragao_negro_jovem":
         monstro = {
-            "nome_monstro": "Algoz do Caos",
-            "vida_monstro": 200,
-            "dano_monstro": 50,
-            "velocidade_monstro": 28,
-            "defesa_monstro": 22,
-            "xp_monstro": 240,
-            "drop_moeda": 100,
-            "drops_100_monstro": []
+            "nome_monstro": "Dragão Negro Jovem",
+            "vida_monstro": 380,
+            "dano_monstro": 55,
+            "velocidade_monstro": 26,
+            "defesa_monstro": 42,
+            "xp_monstro": 450,
+            "drop_moeda": 200,
+            "drops_100%_monstro": []
         }
+
     elif entrada_monstro == "feiticeiro_sombrio":
         monstro = {
             "nome_monstro": "Feiticeiro Sombrio",
@@ -1005,30 +807,9 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 20,
             "xp_monstro": 250,
             "drop_moeda": 120,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "demonio_de_fogo":
-        monstro = {
-            "nome_monstro": "Demônio de Fogo",
-            "vida_monstro": 230,
-            "dano_monstro": 46,
-            "velocidade_monstro": 22,
-            "defesa_monstro": 28,
-            "xp_monstro": 280,
-            "drop_moeda": 130,
-            "drops_100_monstro": []
-        }
-    elif entrada_monstro == "golem_de_sangue":
-        monstro = {
-            "nome_monstro": "Golem de Sangue",
-            "vida_monstro": 300,
-            "dano_monstro": 40,
-            "velocidade_monstro": 10,
-            "defesa_monstro": 35,
-            "xp_monstro": 300,
-            "drop_moeda": 140,
-            "drops_100_monstro": []
-        }
+
     elif entrada_monstro == "general_de_elite":
         monstro = {
             "nome_monstro": "General de Elite",
@@ -1038,93 +819,86 @@ def monstros(entrada_monstro): #aq temos um dicionario que funciona como um tipo
             "defesa_monstro": 40,
             "xp_monstro": 320,
             "drop_moeda": 180,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
+
     elif entrada_monstro == "comandante":
         monstro = {
-            "nome_monstro": "Comandante",
+            "nome_monstro": "Comandante da Guarda Real",
             "vida_monstro": 320,
             "dano_monstro": 55,
             "velocidade_monstro": 26,
             "defesa_monstro": 45,
             "xp_monstro": 350,
             "drop_moeda": 220,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
-    elif entrada_monstro == "dragao_de_sombras":
-        monstro = {
-            "nome_monstro": "Dragão de Sombras",
-            "vida_monstro": 500,
-            "dano_monstro": 65,
-            "velocidade_monstro": 28,
-            "defesa_monstro": 50,
-            "xp_monstro": 800,
-            "drop_moeda": 400,
-            "drops_100_monstro": []
-        }
+
+    #BOSS FINAL
+
     elif entrada_monstro == "lorde_loop_f1":
         monstro = {
-            "nome_monstro": "Lorde Loop (Fase 1)",
+            "nome_monstro": "Lorde do Loop (Fase 1 - Arcano)",
             "vida_monstro": 650,
             "dano_monstro": 70,
             "velocidade_monstro": 30,
             "defesa_monstro": 40,
             "xp_monstro": 1000,
             "drop_moeda": 0,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
+
     elif entrada_monstro == "lorde_loop_f2":
         monstro = {
-            "nome_monstro": "Lorde Loop (Fase 2)",
+            "nome_monstro": "Lorde do Loop (Fase 2 - Físico)",
             "vida_monstro": 850,
             "dano_monstro": 85,
             "velocidade_monstro": 35,
             "defesa_monstro": 55,
             "xp_monstro": 2000,
             "drop_moeda": 1000,
-            "drops_100_monstro": []
+            "drops_100%_monstro": []
         }
 
     return monstro
-
 # FASESSS
 def exibirtxt(fase):
 
-    monstro_sorteado="nenhum"
+    monstro_sorteado = "nenhum"
 
     if fase == 1:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 1 -=-=-=-=-=-=-=-""")
         print("""
 Você abre os olhos. Está em uma clareira úmida, cercada por vegetação densa.
-Ao norte, você vê uma trilha, parece ser sua única opção.
+Ao norte, você vê uma trilha. Parece ser sua única opção.
 Por algum motivo, ela é muito familiar.
 """)
+
     if fase == 2:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 2 -=-=-=-=-=-=-=-""")
 
-        lobo= """
+        lobo = """
 Passando pela entrada da trilha, você percebe o quão grande ela é.
 Sons de pássaros, do vento e das folhas formam um barulho aconchegante.
 Vem um sentimento estranho, você já viveu aquilo.
 Perdido em seus pensamentos, você escuta um barulho de galhos quebrando à sua esquerda.
 Da profunda e escura floresta ergue-se um Lobo Solitário. Seu rosto entrega a fome.
 """
-        slime="""
+        slime = """
 Passando pela entrada da trilha, você percebe o quão grande ela é.
 Sons de pássaros, do vento e das folhas formam um barulho aconchegante.
 Vem um sentimento estranho, você já viveu aquilo.
 Perdido em seus pensamentos, você escuta um barulho de galhos quebrando à sua esquerda.
 Da profunda e escura floresta ergue-se um Slime Verde. Pronto para reabastecer suas energias com carne fresca.
-        """
-
-        opcoes=[lobo,slime]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==lobo:
-            monstro_sorteado="lobo_solitario"
+"""
+        opcoes = [lobo, slime]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == lobo:
+            monstro_sorteado = "lobo_solitario"
         else:
-            monstro_sorteado="slime_verde"
+            monstro_sorteado = "slime_verde"
         print(texto_sorteado)
         return monstro_sorteado
 
@@ -1132,44 +906,41 @@ Da profunda e escura floresta ergue-se um Slime Verde. Pronto para reabastecer s
         print("""
         =-=-=-=-=-=-=-=-=- FASE 3 -=-=-=-=-=-=-=-""")
 
-        arbusto="""
+        arbusto = """
 Seguindo a trilha cansado, você encontra um arbusto de bagas.
 Aquela cor carmim faz você comer sem pensar duas vezes.
 """
-
-        pegadas="""
+        pegadas = """
 Seguindo a trilha cansado, você olha para o chão e encontra pegadas suspeitas.
 """
-        opcoes=[arbusto,pegadas]
-        texto_sorteado=random.choice(opcoes)
+        opcoes = [arbusto, pegadas]
+        texto_sorteado = random.choice(opcoes)
         print(texto_sorteado)
-        
+
     if fase == 4:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 4 -=-=-=-=-=-=-=-""")
 
-        rato= """
+        rato = """
 Seguindo em frente, a trilha não parece ter fim.
 Ao longe, você vê grandes pedras.
 Se aproximando, um Rato Gigante pula em sua direção,
 determinado a arrancar um pedaço seu para alimentar seus filhotes.
 """
-        goblin="""
+        goblin = """
 Seguindo em frente, a trilha não parece ter fim.
 Ao longe, você vê grandes pedras. Se aproximando, um Goblin Saqueador.
 Dentes afiados e uma pequena lança de madeira nas mãos,
 ele está pronto para extorquir um novato por aquelas bandas.
-        """
-
-        opcoes=[rato,goblin]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==goblin:
-            monstro_sorteado="gonlin_saqueador"
+"""
+        opcoes = [rato, goblin]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == goblin:
+            monstro_sorteado = "goblin_saqueador"
         else:
-            monstro_sorteado="rato_gigante"
+            monstro_sorteado = "rato_gigante"
         print(texto_sorteado)
         return monstro_sorteado
-
 
     if fase == 5:
         print("""
@@ -1180,37 +951,37 @@ Mas, se aproximando, percebe que é uma fogueira.
 Cauteloso, você se aproxima e encontra uma barraquinha.
 Seu Otto, um vendedor. O rosto dele é familiar, mas você ainda não sabe o porquê.
 
--Olá, aventureiro(a)! Que alegria ver alguém por aqui. Deseja comprar alguma coisa? 
+— Olá, aventureiro(a)! Que alegria ver alguém por aqui. Deseja comprar alguma coisa?
 """)
 
     if fase == 6:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 6 -=-=-=-=-=-=-=-""")
         print("""
-Você estranhamente reconhece o Otto, lembra da sua voz, cheiro, rosto e até do seu sotaque puxado.
-Com medo, você decide ignorar isso. Intrigado, você não percebe um grande laço no chão, uma armadilha de laço.
+Você estranhamente reconhece o Otto. Lembra da sua voz, do cheiro, do rosto e até do seu sotaque puxado.
+Com medo, você decide ignorar isso. Intrigado, não percebe um grande laço no chão — uma armadilha.
 Como você pode cair nisso?
- """)
+""")
 
     if fase == 7:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 7 -=-=-=-=-=-=-=-""")
-        goblin= """
-Você escuta um ronco. Olha para a frente e vê um goblin com o escudo caído no chão
+
+        goblin = """
+Você escuta um ronco. Olha para a frente e vê um goblin com o escudo caído no chão.
 Ao se aproximar, ele acorda de repente e dá um pulo na sua direção.
 Aquela cara verde e suja te causa um desconforto absurdo.
 """
-        aranha="""
+        aranha = """
 Lentamente, uma aranha gigantesca desce da escura copa das árvores.
 Você tem certeza de que uma única picada dela te levaria direto ao purgatório.
-        """
-
-        opcoes=[aranha,goblin]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==goblin:
-            monstro_sorteado="goblin_guerreiro"
+"""
+        opcoes = [aranha, goblin]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == goblin:
+            monstro_sorteado = "goblin_guerreiro"
         else:
-            monstro_sorteado="aranha"
+            monstro_sorteado = "aranha"
         print(texto_sorteado)
         return monstro_sorteado
 
@@ -1225,32 +996,33 @@ Sua sorte é que a madeira, por causa da umidade, já está apodrecendo.
 
     if fase == 9:
         print("""
-        =-=-=-=-=-=-=-=-=- FASE 9 -=-=-=-=-=-=-=-""")        
+        =-=-=-=-=-=-=-=-=- FASE 9 -=-=-=-=-=-=-=-""")
         print("""
-Uma névoa mágica densa cobre a trilha
-e o som da floresta silencia.
+Uma névoa mágica densa cobre a trilha.
+O som da floresta silencia por completo.
+O ar fica pesado e você sente que algo observa você de dentro da névoa.
 """)
 
     if fase == 10:
         print("""
-        =-=-=-=-=-=-=-=-=- FASE 10 -=-=-=-=-=-=-=-""")     
+        =-=-=-=-=-=-=-=-=- FASE 10 -=-=-=-=-=-=-=-""")
         print("""
 Uma luz! Você vê uma luz no final da trilha.
 Ao se aproximar, ela some de repente.
-Uma sombra gigantesca surge na sua frente um urso que parece ser feito de pedra.
-Você tem um mau pressentimento do que pode acontecer com você...
- """)
+Uma sombra gigantesca surge à sua frente, um urso que parece ser feito de pedra.
+Você tem um mau pressentimento do que pode acontecer...
+""")
 
     if fase == 11:
         print("""
-        =-=-=-=-=-=-=-=-=- FASE 11 -=-=-=-=-=-=-=-""")    
+        =-=-=-=-=-=-=-=-=- FASE 11 -=-=-=-=-=-=-=-""")
         print("""
 Finalmente você sai desta maldita trilha escura e úmida. Suas narinas se aliviam e deixam de sentir aquele cheiro de carniça.
 Pela primeira vez em muito tempo, você vê o céu, escuta os pássaros e sente a brisa fresca do vento batendo em seu rosto.
 À frente, avista uma fonte de água cristalina que parece extremamente convidativa.
 Sem hesitar, você se aproxima e bebe daquela água.
- 
-Sua vida e mana é completamente restaurada.
+
+Sua vida e mana são completamente restauradas.
 """)
 
     if fase == 12:
@@ -1261,14 +1033,14 @@ A floresta termina de forma abrupta.
 O chão coberto de folhas e musgo dá lugar a pedras úmidas e frias.
 Diante de você se abre a boca de uma Caverna Escura, como se a própria terra tivesse sido rasgada.
 Do interior sobe um ar gelado e pesado, carregado de um cheiro antigo de umidade, terra e algo quase metálico.
-A entrada nao é nada convidativa, e a escuridão lá dentro é tão densa que a luz do dia parece parar na entrada, como se tivesse medo de entrar.
+A entrada não é nada convidativa, e a escuridão lá dentro é tão densa que a luz do dia parece parar na soleira, como se tivesse medo de entrar.
 Você está de pé na divisa entre a floresta e a escuridão.
- """)
+""")
 
     if fase == 13:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 13 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 O ar fica imediatamente frio e úmido assim que você cruza a entrada.
 Na parede à sua direita, ainda na soleira da caverna, há uma tocha cravada em um suporte de ferro enferrujado.
 A chama treme, mas continua viva. Você a pega. A madeira está úmida, mas o fogo resiste.
@@ -1280,7 +1052,8 @@ O chão desce levemente, e o som dos seus passos ecoa abafado.
     if fase == 14:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 14 -=-=-=-=-=-=-=-""")
-        morcego= """
+
+        morcego = """
 Do fundo escuro da caverna, você escuta o bater rápido de asas… e então um guincho agudo corta o silêncio.
 O som é tão perto e tão repentino que você tropeça e cai no chão de pedra.
 No mesmo instante, um morcego passa rente à sua cabeça, quase raspando o cabelo.
@@ -1288,30 +1061,29 @@ O vento das asas geladas bate em seu rosto. Você se levanta depressa e olha par
 A criatura paira por um segundo na penumbra da tocha.
 Seus olhos vermelhos brilham e a boca se abre, revelando dentes longos, finos e afiados… feitos, sem dúvida, para perfurar e sugar sangue.
 """
-        goblin="""
+        goblin = """
 Com a tocha na mão, a escuridão recua alguns metros.
 Você escuta batidas ritmadas na rocha vindas do fundo da caverna.
 O barulho se aproxima rapidamente.
 Da escuridão surge uma figura baixa e agitada. É um goblin.
 Ele carrega uma picareta pequena, proporcional ao seu corpo magro, e uma lamparina de óleo que balança violentamente na mão.
 Seus olhos amarelados se arregalam ao te ver.
-Por um segundo ele trava… depois grita algo incompreensível e começa a correr na sua direção, com sua picareta erguida.
-        """
-
-        opcoes=[morcego,goblin]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==goblin:
-            monstro_sorteado="gonlin_minerador"
+Por um segundo ele trava… depois grita algo incompreensível e começa a correr na sua direção, com a picareta erguida.
+"""
+        opcoes = [morcego, goblin]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == goblin:
+            monstro_sorteado = "goblin_minerador"
         else:
-            monstro_sorteado="morcego"
+            monstro_sorteado = "morcego"
         print(texto_sorteado)
         return monstro_sorteado
 
     if fase == 15:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 15 -=-=-=-=-=-=-=-""")
-        print(""" 
-Andando rápido, você pisa em algo que cede sob o pé uma placa de pressão.
+        print("""
+Andando rápido, você pisa em algo que cede sob o pé, uma placa de pressão.
 Só percebe o que aconteceu quando sente uma agulhada forte no peito. Um dardo está fincado ali.
 Rápido você o arranca. Da ponta escorre um líquido verde e viscoso.
 Você sofre 20 de dano e agora está envenenado.
@@ -1320,26 +1092,27 @@ Você sofre 20 de dano e agora está envenenado.
     if fase == 16:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 16 -=-=-=-=-=-=-=-""")
-        esqueleto= """
+
+        esqueleto = """
 Ainda com uma dor muito forte do veneno no peito, você avança.
 Escuta um zunido e uma flecha passa rasgando seu braço.
 Foi um corte leve, mas a dor é ardente.
 À sua frente, um esqueleto com arco e flecha mira em sua direção.
 """
-        larva="""
+        larva = """
 Ainda com uma dor muito forte do veneno no peito, você avança.
 Sente um pequeno tremor e, do chão, uma larva com dentes enormes emerge.
-Incrivelmente, ela é extremamente ágil no solo parece que está nadando pela terra.
-        """
-
-        opcoes=[larva,esqueleto]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==esqueleto:
-            monstro_sorteado="esqueleto_armado"
+Incrivelmente, ela é extremamente ágil no solo, parece que está nadando pela terra.
+"""
+        opcoes = [larva, esqueleto]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == esqueleto:
+            monstro_sorteado = "esqueleto_armado"
         else:
-            monstro_sorteado="larva_escavadora"
+            monstro_sorteado = "larva_escavadora"
         print(texto_sorteado)
         return monstro_sorteado
+
     if fase == 17:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 17 -=-=-=-=-=-=-=-""")
@@ -1350,24 +1123,25 @@ Mais à frente encontra um pequeno carrinho de mina.
 Apesar do tamanho, ele está cheio de moedas e joias.
 """)
 
-    if fase == 18: # o gol vende minerais e se vc comprar ele te da uns de brinde
+    if fase == 18:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 18 -=-=-=-=-=-=-=-""")
         print("""
 Encantado com o carrinho, você começa a escutar batidas nas rochas.
 Sabe que pode ser um goblin e se aproxima com cautela.
-Vê um ser pequeno, sujo e barrigudo. Um bom sinal ele não é verde.
+Vê um ser pequeno, sujo e barrigudo. Um bom sinal, ele não é verde.
 Você fica aliviado, mas mesmo assim ainda com medo. Continua se aproximando.
 Ele te vê e te cumprimenta.
 
--Olá senhor(a) aventureiro, como pôde chegar até essa velha e abandonada mina? Eu sou Golmer o anão, mas pode me chamar de Gol.
+— Olá, senhor(a) aventureiro. Como pôde chegar até essa velha e abandonada mina? Eu sou Golmer, o anão, mas pode me chamar de Gol.
 Precisa de alguma coisa?
- """)
+""")
 
     if fase == 19:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 19 -=-=-=-=-=-=-=-""")
-        necrofago= """
+
+        necrofago = """
 O medo te domina novamente. Você já viu esse cara antes, mas não sabe onde e nem quando.
 Lembra da voz e da sua característica barba.
 Dominado pela confusão e pelo medo, você sente um cheiro irresistível de carniça.
@@ -1375,24 +1149,22 @@ Para equivaler a esse cheiro devem ser centenas de corpos em decomposição. É 
 Alguns metros à sua frente um ser com pele úmida e podre surge. Você julga ser um necrófago.
 Ele te encara e você já sabe o que virá a seguir.
 """
-        aranha="""
+        aranha = """
 O medo te domina novamente. Você já viu esse cara antes, mas não sabe onde e nem quando.
 Lembra da voz e da sua característica barba.
 Dominado pela confusão e pelo medo, você vê uma sombra se aproximando, patas, muitas patas.
 Até que a criatura se mostra por completo, uma aranha.
-Nas suas costas centenas de filhotes que incrivelmente são quase da metade do seu tamanho.
-Você tem certeza que uma mãe faria de tudo para proteger seus filhotes.
-        """
-
-        opcoes=[aranha,necrofago]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==aranha:
-            monstro_sorteado="aranha_das_cavernas"
+Nas suas costas, centenas de filhotes que incrivelmente são quase da metade do seu tamanho.
+Você tem certeza de que uma mãe faria de tudo para proteger seus filhotes.
+"""
+        opcoes = [aranha, necrofago]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == aranha:
+            monstro_sorteado = "aranha_das_cavernas"
         else:
-            monstro_sorteado="necrofago"
+            monstro_sorteado = "necrofago"
         print(texto_sorteado)
         return monstro_sorteado
-
 
     if fase == 20:
         print("""
@@ -1404,7 +1176,7 @@ Acho que essa não é a melhor estratégia para sair de uma caverna...
 
 Cada vez mais aparecem mais cristais, até que você vê um cristal posicionado no meio da caverna.
 Ele é extremamente grande. Você se aproxima e um tremor acontece.
-O grande cristal se levanta e se revela como um golem de cristal. Você está de frente com uma montanha viva.
+O grande cristal se levanta e se revela como um Golem de Cristal. Você está de frente com uma montanha viva.
 """)
 
     if fase == 21:
@@ -1415,7 +1187,7 @@ Você chega a um trecho mais úmido da mina. O ar fica pesado e o chão escorreg
 Do outro lado da água uma pequena canoa se aproxima devagar. Dentro dela um ser magro, pálido e agachado rema com movimentos estranhos. Atrás dele estão três baús fechados.
 A canoa para na beira. O bichinho levanta a cabeça e sorri com dentes amarelados.
 
--Meu precioso… ah, um aventureiro. Sim, sim. Eu sou Gollum. Gollum.
+— Meu precioso… ah, um aventureiro. Sim, sim. Eu sou Gollum. Gollum.
 A regra é simples, muito simples. Três baús. Só um tem o prêmio. Os outros dois… ruins. Muito ruins.
 Você escolhe um. Só um. Se acertar, leva o que está dentro. Se errar… coisas ruins podem acontecer com você. Coisas bem ruins.
 Então… qual baú você escolhe, hein? O da esquerda, o do meio ou o da direita?
@@ -1424,9 +1196,9 @@ Então… qual baú você escolhe, hein? O da esquerda, o do meio ou o da direit
     if fase == 22:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 22 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 Passando ao redor do lago, você vê pequenas luzes no teto da caverna.
-Se aproximando, você percebe serem plantas, e melhor que isso, o brilho vinha de pequenas frutinhas,
+Se aproximando, você percebe serem plantas. E melhor que isso, o brilho vinha de pequenas frutinhas,
 bagas brilhantes, uma iguaria considerando sua localização.
 """)
 
@@ -1437,7 +1209,7 @@ bagas brilhantes, uma iguaria considerando sua localização.
 Logo à frente das bagas brilhantes, você vê um altar de pedra.
 Ao se aproximar, uma vontade extrema de se ajoelhar sobre ele te consome.
 Você não sabe o porquê, mas parece que já viu aquele altar e já sentiu a mesma sensação.
- """)
+""")
 
     if fase == 24:
         print("""
@@ -1446,29 +1218,29 @@ Você não sabe o porquê, mas parece que já viu aquele altar e já sentiu a me
 Uma curva brusca na ravina revela uma luz roxa.
 Você vê uma fumaça roxa, luzes e um cheiro encantador saindo de um buraco roxo no chão.
 Você julga ser um portal. Conforme você se aproxima, o portal reage.
-Algo muito estranho pelo seu ponto de vista.
- """)
+Algo muito estranho, pelo seu ponto de vista.
+""")
 
     if fase == 25:
         print("""
-        =-=-=-=-=-=-=-=-=- FASE 25 -=-=-=-=-=-=-=-""")        
-        print(""""
-Após entrar, você se sente no espaço. Você começa a flutuar nunca sentiu uma sensação tão boa quanto essa.
+        =-=-=-=-=-=-=-=-=- FASE 25 -=-=-=-=-=-=-=-""")
+        print("""
+Após entrar, você se sente no espaço. Você começa a flutuar. Nunca sentiu uma sensação tão boa quanto essa.
 Lentamente, você nada pelo ar em um lugar totalmente preto.
-Você sente muita mana ao seu redor e... lentamente... você começa a se lembrar...
-você já viveu tudo isso... você se lembra, lembra com certeza... 
-agora faz sentido você ter lembrado do rosto de Otto e de outros.
-Você já viveu isso, você lembra, mas... você não sabe o porquê está vivendo isso novamente.
-Agora paredes se formam ao seu redor e você cai em um salão de pedras. 
+Você sente muita mana ao seu redor e… lentamente… você começa a se lembrar…
+Você já viveu tudo isso. Você se lembra. Lembra com certeza.
+Agora faz sentido ter reconhecido o rosto de Otto e de outros.
+Você já viveu isso. Você lembra. Mas… você não sabe o porquê está vivendo isso novamente.
+Então paredes se formam ao seu redor e você cai em um salão de pedras.
 Esse salão está flutuando, você tem essa impressão.
 Pelas pequeninas janelinhas você só vê preto e nada mais.
-O ar cheira a mofo e sente uma mana absurda fluindo de todos os lugares... 
+O ar cheira a mofo e você sente uma mana absurda fluindo de todos os lugares…
 """)
 
     if fase == 26:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 26 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 Paralisado enquanto pensativo, uma grande porta de madeira escura abre lentamente à sua frente.
 Um homem com capuz entra na sala, mas ele não te vê.
 Passando todo o seu corpo para dentro da sala, ele finalmente percebe sua presença. Ele te olha fixamente.
@@ -1481,51 +1253,50 @@ Em seguida você escuta as palavras saírem da sua boca...
 
 Uma bola de fogo surge na frente do homem.
 Agora você sabe, ele é um cultista.
-A bola de fogo é disparada na sua direção e se aproxima surpreendente rápido...
+A bola de fogo é disparada na sua direção e se aproxima surpreendentemente rápido...
 """)
 
     if fase == 27:
         print("""
-        =-=-=-=-=-=-=-=-=- FASE 27 -=-=-=-=-=-=-=-""")        
+        =-=-=-=-=-=-=-=-=- FASE 27 -=-=-=-=-=-=-=-""")
         print("""
 Aquele homem… Você sente repulsa pelo que fez com ele.
 Passando pela única porta do salão por onde ele entrou, você se depara com dois caminhos.
-Por intuição, decide ir para a esquerda. Seguindo por ali, encontra uma estátua ela fala..
+Por intuição, decide ir para a esquerda. Seguindo por ali, encontra uma estátua. Ela fala
 
-— O que é o que é...
+— O que é o que é… que quanto mais se tira, maior fica?
 
 Você dá um pulo de susto. Como uma estátua pode estar falando?
-Mas a esse ponto você nem se questiona mais e simplesmente aceita. 
-A estátua continua...
- """)
+Mas a esse ponto você nem se questiona mais e simplesmente aceita.
+A estátua continua, aguardando sua resposta.
+""")
 
     if fase == 28:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 28 -=-=-=-=-=-=-=-""")
-        espada= """
+
+        espada = """
 O caminho que você seguiu não tem saída além da estátua. Então você decide voltar.
 Seguindo pelo caminho da direita, após a primeira esquina, você vê uma espada voando.
 Ela não tem olhos nem boca, mas sentiu quando você chegou.
-Assustado, você tenta correr, até porque, como uma espada estaria flutuando? mas não adianta.
+Assustado, você tenta correr, afinal, como uma espada estaria flutuando? Mas não adianta.
 Incrivelmente, ela é absurdamente rápida.
 """
-        elementar="""
+        elementar = """
 O caminho que você seguiu não tem saída além da estátua. Então você decide voltar.
 Seguindo pelo caminho da direita, após a primeira esquina, você vê uma chama começar a subir do chão.
 A chama tem vida e se mexe normalmente. Ela começa a tomar forma.
 No meio, já não é mais fogo, parece ser algo sólido, até que aquilo toma um rosto e mãos.
-Ele te olha e o grande elemental de fogo começa a andar lentamente na sua direção.
-        """
-
-        opcoes=[espada,elementar]
-        texto_sorteado=random.choice(opcoes)
-        if texto_sorteado==elementar:
-            monstro_sorteado="elementar_de_fogo"
+Ele te olha e o grande Elemental de Fogo começa a andar lentamente na sua direção.
+"""
+        opcoes = [espada, elementar]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == elementar:
+            monstro_sorteado = "elemental_de_fogo"
         else:
-            monstro_sorteado="lamina_vazia"
+            monstro_sorteado = "lamina_vazia"
         print(texto_sorteado)
         return monstro_sorteado
-
 
     if fase == 29:
         print("""
@@ -1540,7 +1311,7 @@ Ao entrar com cautela, escuta uma voz doce.
 Uma maga te recebe com muita animação...
 
 — Oláaa, vagante! Sou Vivian. Deseja levar alguma coisa? Se quiser, posso fazer encantamentos também...
- """)
+""")
 
     if fase == 30:
         print("""
@@ -1556,19 +1327,19 @@ Caído no chão, desnorteado, você sente o cheiro da fumaça, vê fogo por todo
 
 — Sagrado é o espírito da água e das vertentes...
 
-Você desmaia. 
-""")  
+Você desmaia.
+""")
 
     if fase == 31:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 31 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 Você abre os olhos. Está deitado. A dor diminuiu. Olha para o braço e vê que ele não está mais ali.
 Sente o mesmo cheiro de lavanda. Está deitado em uma cama no canto do quarto.
 Vivian está sentada, lendo algo que parece um livro sobre runas.
 Ela repara que você acordou e diz com um sorriso meigo...
 
-— Bom dia, como foi seu descanso?
+— Bom dia. Como foi seu descanso?
 
 Vocês conversam. Ela explica que você perdeu o braço em uma explosão de runa bem perto da sua loja.
 Estava caído, todo ensanguentado e rodeado por fogo.
@@ -1579,19 +1350,20 @@ mas sem ela você com certeza teria morrido naquele chão sujo.
 """)
 
     if fase == 32:
-       print("""
+        print("""
         =-=-=-=-=-=-=-=-=- FASE 32 -=-=-=-=-=-=-=-""")
-       elemental= """
-Saindo, você agradece por tudo que Lilian fez por você e também por ela não ter cobrado nada.
+
+        elemental = """
+Saindo, você agradece por tudo que Vivian fez por você e também por ela não ter cobrado nada.
 Como ela mesma disse, apenas uma visita no futuro seria o bastante para pagar.
 Você segue o caminho agora sem seu braço esquerdo.
 Após algumas horas caminhando, você começa a sentir frio.
-Quanto mais avança, mais frio vai ficando, até que de repente um elemental de gelo flutuando aparece na sua frente.
+Quanto mais avança, mais frio vai ficando, até que de repente um Elemental de Gelo flutuando aparece na sua frente.
 O frio é tão perturbador que você fica desnorteado.
 Ele te encara e resmunga algo incompreensível enquanto flutua em sua direção.
 """
-       mago="""
-Saindo, você agradece por tudo que Lilian fez por você e também por ela não ter cobrado nada.
+        mago = """
+Saindo, você agradece por tudo que Vivian fez por você e também por ela não ter cobrado nada.
 Como ela mesma disse, apenas uma visita no futuro seria o bastante para pagar.
 Você segue o caminho agora sem seu braço esquerdo.
 Após algumas horas caminhando, você vê ao longe uma pessoa virada de costas.
@@ -1599,22 +1371,20 @@ Não sabe se ataca ou não. Logo após pensar sobre isso, ela se vira imediatame
 Parece que esse ser sentiu a sua presença. É um mago com capa preta e um cajado.
 Ele fala algo que você não escuta e, de repente, três estacas de gelo voam na sua direção.
 Sorte a sua que as três quase te acertaram.
-        """
-
-       opcoes=[mago,elemental]
-       texto_sorteado=random.choice(opcoes)
-       if texto_sorteado==mago:
-           monstro_sorteado="mago_renegado"
-       else:
-           monstro_sorteado="elementar_de_gelo"
-       print(texto_sorteado)
-       return monstro_sorteado
-
+"""
+        opcoes = [mago, elemental]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == mago:
+            monstro_sorteado = "mago_renegado"
+        else:
+            monstro_sorteado = "elemental_de_gelo"
+        print(texto_sorteado)
+        return monstro_sorteado
 
     if fase == 33:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 33 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 Esse ser estava guardando uma porta a poucos metros à frente.
 Você se aproxima devagar e a abre. Dentro, vê uma mulher de capa e capuz roxos.
 Um sentimento aterrorizante cai sobre você. Ela vira o rosto rapidamente e te encara.
@@ -1622,7 +1392,7 @@ Seus olhos amarelos te dão medo. Num movimento rápido, saca um cajado que flut
 
 — Sagrada é a terra, a mãe dos seres vivos. Use sua força para construir e destruir.
 
-Atrás de você uma parede de terra se ergue, impedindo qualquer fuga. 
+Atrás de você uma parede de terra se ergue, impedindo qualquer fuga.
 Então ela começa a avançar lentamente na sua direção.
 """)
 
@@ -1634,8 +1404,8 @@ Após a morte dela, você percebe o quão fortes os magos são.
 O corpo dela, agora reduzido a cinzas, se degrada e deixa um cheiro estranho na sala.
 Depois da luta, finalmente sobra tempo para analisar o ambiente.
 Você vê barris, espadas, armaduras e baús, mas um baú em particular te chama muito a atenção.
-Ele está flutuando. Ao se aproximar e abri-lo, encontra dentro um anel com um cristal, que flutua.
- """)
+Ele está flutuando. Ao se aproximar e abri-lo, encontra dentro um anel com um cristal, que também flutua.
+""")
 
     if fase == 35:
         print("""
@@ -1647,15 +1417,16 @@ Ao se aproximar, um bilhete em cima chama sua atenção.
 “O sangue glorioso faz um pacto sagrado.”
 
 Você fica indeciso.
- """)
+""")
 
     if fase == 36:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 36 -=-=-=-=-=-=-=-""")
         print("""
 A única e grande porta que sobrou. Você decide abri-la para seguir seu caminho.
-Após se aproximar dela, tenta abrir e vê que a porta estava trancada.
- """)
+Após se aproximar dela, tenta abrir e percebe que está trancada.
+Não há chave à vista. O metal parece antigo e resistente.
+""")
 
     if fase == 37:
         print("""
@@ -1663,28 +1434,28 @@ Após se aproximar dela, tenta abrir e vê que a porta estava trancada.
         print("""
 Uma luz forte aparece na porta. Um grande portal se abre, igual àquele que você já havia atravessado antes para chegar aqui.
 Você entra e novamente sente a mesma sensação de antes, uma das melhores que já experimentou.
- """)
+""")
 
-    if fase == 38: #menos vfelocidade
+    if fase == 38:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 38 -=-=-=-=-=-=-=-""")
         print("""
 Você abre seus olhos e vê que já atravessou o portal.
 Na sua frente é possível ver um gigantesco castelo.
-Estava à noite e chovendo. Você se encharca completamente.
+Está à noite e chovendo. Você se encharca completamente.
 Rapidamente, para evitar se molhar mais, você corre, mesmo que seja difícil, até o portão do castelo.
 Com esforço, você o empurra e entra.
 Um cheiro de umidade invade seu nariz e um ar quente te traz um aconchego, mas isso não dura muito tempo.
- """)
+""")
 
     if fase == 39:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 39 -=-=-=-=-=-=-=-""")
         print("""
 Ao passar seu corpo para a parte de dentro, uma espada te acerta de raspão.
-Um guarda com uma armadura completa de ferro, ele tem um corpo humano, mas seu comportamento não parece de um.
+Um guarda com armadura completa de ferro. Ele tem um corpo humano, mas seu comportamento não parece de um.
 Ele começa a te atacar freneticamente...
- """)
+""")
 
     if fase == 40:
         print("""
@@ -1697,7 +1468,7 @@ O lugar está quieto, mas agora o cheiro é de mofo. Está escuro.
 Você pega a tocha que estava no suporte de ferro do lado de fora da sala e a leva para dentro.
 Ao iluminar o ambiente, você vê caixas e sacos, é um dos estoques de comida do castelo.
 Há comida em abundância, mas são apenas comidas secas...
- """)
+""")
 
     if fase == 41:
         print("""
@@ -1706,64 +1477,253 @@ Há comida em abundância, mas são apenas comidas secas...
 Saindo dali, você continua a seguir o tapete vermelho.
 Nesse caminho, você sobe duas escadas.
 Após subir, você vê dois caminhos, esquerda e direita.
-Você decide ir à direita, pois é o melhor caminho.
+Você decide ir à direita, pois parece ser o melhor caminho.
 Você o segue até o final e não encontra uma esquina.
 Continuando por ele, você vê uma porta no final e, ao lado dessa porta, um cavaleiro negro está encostado na parede.
 
-- zzzz....zzzzz.....zzzz...
+— zzzz....zzzzz.....zzzz...
 
 Alguém está no quinto sono, você pensa. Você chega perto e a sua presença o acorda no susto.
- """)
+""")
 
     if fase == 42:
         print("""
         =-=-=-=-=-=-=-=-=- FASE 42 -=-=-=-=-=-=-=-""")
-        print(""" 
+        print("""
 Seguindo pelo outro corredor, você encontra outra escada, mas antes dela há uma porta de madeira à direita.
 Você a abre e ela dá na parte de fora do castelo, agora na parte alta.
 Está chovendo e você decide voltar.
 Lentamente, enquanto voltava, você escuta barulhos de asas bem altos e um tremor.
-Ao se virar lentamente, você se depara com um dragão negro jovem.
+Ao se virar lentamente, você se depara com um Dragão Negro jovem.
 Sua sorte é que não é um adulto, senão você não teria nem chances.
 Ele te encara e dá um rugido devastador que faz seus tímpanos zumbirem.
 """)
 
     if fase == 43:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 43 -=-=-=-=-=-=-=-""")
+        print("""
+Você continua pelo corredor principal do castelo. O tapete vermelho está sujo e desgastado.
+À esquerda, uma porta pesada de madeira escura chama sua atenção. Sobre ela, uma placa antiga “Arsenal”.
+Você empurra a porta. O interior é um depósito de armas. Lanças, espadas, escudos e cajados estão alinhados nas paredes, cobertos por uma fina camada de poeira.
+No centro da sala há uma pedra de amolar e um pequeno altar de manutenção.
+""")
 
     if fase == 44:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 44 -=-=-=-=-=-=-=-""")
+        print("""
+Mais adiante no corredor, você encontra uma pequena sala iluminada por velas.
+Ali está um homem baixo, barrigudo e de barba grisalha. Ele organiza frascos em uma mesa improvisada.
+Quando te vê, sorri de canto de boca.
+
+— Olá de novo, aventureiro… ou seria a primeira vez?
+
+Ele é Othon, o mercador o mesmo da outra vez.
+
+— Trago apenas o que resta de valor neste castelo amaldiçoado. Quer ver?
+""")
 
     if fase == 45:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 45 -=-=-=-=-=-=-=-""")
+
+        feiticeiro = """
+O corredor se estreita. De repente o ar fica pesado e frio.
+Uma figura encapuzada surge das sombras, flutuando alguns centímetros acima do chão.
+Seus olhos brilham em roxo escuro. Ele levanta a mão e murmura algo em uma língua antiga.
+
+— Você não deveria ter chegado tão longe…
+
+É um Feiticeiro Sombrio.
+"""
+        general = """
+O corredor se estreita. De repente você escuta o tilintar de armadura pesada.
+Uma figura alta e robusta aparece bloqueando o caminho. Usa uma armadura negra completa e carrega uma grande espada de duas mãos.
+Seu olhar é frio e disciplinado.
+
+— Nenhum intruso passa daqui. Ordens do Lorde.
+
+É o General de Elite da guarda do castelo.
+"""
+        opcoes = [feiticeiro, general]
+        texto_sorteado = random.choice(opcoes)
+        if texto_sorteado == feiticeiro:
+            monstro_sorteado = "feiticeiro_sombrio"
+        else:
+            monstro_sorteado = "general_de_elite"
+        print(texto_sorteado)
+        return monstro_sorteado
 
     if fase == 46:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 46 -=-=-=-=-=-=-=-""")
+        print("""
+Após o combate, o corredor se abre em uma pequena sala circular.
+No centro há uma fonte de água cristalina cercada por runas suaves que emitem uma luz azulada.
+O ar aqui é limpo. O cheiro de mofo desaparece.
+Você se aproxima. A água parece convidar.
+Como da ultima vez, beber dela restaurara completamente sua vida e mana.
+""")
 
     if fase == 47:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 47 -=-=-=-=-=-=-=-""")
+        print("""
+Você retoma o caminho. O silêncio do castelo agora é diferente.
+De repente, vozes sussurradas começam a ecoar nas paredes, como se viessem de todos os lados ao mesmo tempo.
+
+-Você já esteve aqui…
+-Você sempre falha…
+-Por que continua tentando?
+-Desta vez também não será diferente…
+
+Os sussurros do Lorde do Loop tentam entrar na sua mente, tentando desestabilizar você.
+""")
 
     if fase == 48:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 48 -=-=-=-=-=-=-=-""")
+        print("""
+No final do grande corredor há uma escadaria larga que sobe em direção a uma porta monumental.
+No meio da escada, bloqueando a passagem, está um homem de armadura dourada e capa vermelha.
+Ele segura uma lança longa e olha para você com desprezo.
+
+— Eu sou o Comandante da Guarda Real. Você chegou longe demais, forasteiro.
+
+Ele aponta a lança na sua direção.
+
+— Não haverá passagem.
+""")
 
     if fase == 49:
-        print(" ")
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 49 -=-=-=-=-=-=-=-""")
+        print("""
+Depois do combate, você sobe os últimos degraus.
+Diante de você está a Porta do Trono. Enorme, de madeira negra reforçada com ferro e runas brilhantes.
+Uma mensagem antiga está gravada no centro da porta, como se tivesse sido escrita para você
+
+“Deseja cruzar o ponto sem retorno?”
+
+O ar ao redor parece mais denso. Você sente que, uma vez que passar por ela, não haverá mais volta.
+""")
 
     if fase == 50:
-        print(" ")
-     
-def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items_no_inv,fase,fome,ouro,peso,xp,nivel,armadura): # Inicia o jogo 
-    limpar()
-    inicio_sessao = time.time() 
+        print("""
+        =-=-=-=-=-=-=-=-=- FASE 50 -=-=-=-=-=-=-=-""")
+        print("""
+Você empurra a porta. Ela cede com um gemido grave.
+O salão do trono é vasto e circular. No centro, sobre um pedestal de pedra negra, está sentado um homem de capa e coroa quebrada.
+Ele levanta o rosto lentamente. Seus olhos são os mesmos de sempre… os seus.
 
-    # vida e mana no momento em que o jogo comeca viram o "maximo" pra poder
-    # limitar quanto os itens de cura conseguem recuperar
+— Finalmente. Você chegou de novo.
+
+Ele se levanta. A sala treme.
+
+— Eu sou o Lorde do Loop. Ou, se preferir… o que resta de você depois de tantas tentativas.
+
+Primeiro ele levanta as mãos e o ar se enche de energia arcana.
+Depois, quando a magia falha, ele puxa uma espada do nada e avança.
+""")
+
+    return monstro_sorteado
+
+def batalha(velocidade, monstro):
+    dados_monstro = monstros(monstro)
+
+    print(f"\n=== COMBATE: {dados_monstro['nome_monstro']} ===")
+    print(f"Vida do monstro: {dados_monstro['vida_monstro']}")
+    print(f"Dano do monstro: {dados_monstro['dano_monstro']}")
+
+    while dados_monstro['vida_monstro'] > 0:
+
+        #TURNO DO JOGADOR
+    
+        print("""
+        --- Seu turno ---
+        1 - Atacar
+        2 - Fugir
+        """)
+        escolha = input("-> ").strip()
+
+        if escolha == "1":
+            dano_jogador = 5  # depois pega o dano da arma
+            dados_monstro['vida_monstro'] -= dano_jogador
+
+            print(f"\nVocê atacou e causou {dano_jogador} de dano!")
+            print(f"Vida do monstro: {dados_monstro['vida_monstro']}")
+
+            if dados_monstro['vida_monstro'] <= 0:
+                print(f"\nVocê derrotou o {dados_monstro['nome_monstro']}!")
+                break
+
+        elif escolha == "2":
+            print("\nVocê tenta fugir...")
+    # velocidade do jogador precisa ser MAIOR que a do monstro
+            if velocidade > dados_monstro['velocidade_monstro']:
+                print("Você conseguiu fugir!")
+                break
+            else:
+                print("Você não conseguiu fugir!")
+                print(f"O {dados_monstro['nome_monstro']} te alcança e desfere outro golpe!")
+                print(f"(-{dados_monstro['dano_monstro']} de vida)")
+            # vida -= dados_monstro['dano_monstro']
+                
+        else:
+            print("Opção inválida. Você perdeu o turno.")
+
+
+        #TURNO DO MONSTRO
+    
+        print("\n--- Turno do monstro ---")
+        print(f"O {dados_monstro['nome_monstro']} te ataca!")
+        print(f"(-{dados_monstro['dano_monstro']} de vida)")
+
+
+        
+
+
+def escolhas(fase, monstro):
+
+    if fase == 1:
+        input("Pressione Enter para prosseguir...")
+        return fase + 1
+
+    elif fase == 2:          # Fase de combate
+        batalha(fase, monstro)
+        return fase + 1
+
+    elif fase == 3:
+        input("Pressione Enter para continuar...")
+        return fase + 1
+
+    elif fase == 4:          # Outra fase de combate
+        batalha(fase, monstro)
+        return fase + 1
+
+    else:
+        input("Pressione Enter para continuar...")
+        return fase + 1
+
+    input("Pressione Enter para continuar...")
+    return fase + 1
+
+
+def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, items_no_inv, fase, fome, ouro, peso, xp, nivel, armadura):
+    limpar()
+    inicio_sessao = time.time()
+
+    # vida e mana no momento em que o jogo começa viram o "máximo"
     vida_maxima = vida
     mana_maxima = mana
-    
+
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
     while True:
-        exibirtxt(fase)
+        # Chama exibirtxt UMA ÚNICA vez
+        monstro = exibirtxt(fase)
+        fase = escolhas(fase, monstro)
+
         entrada = input("-> ").strip().lower()
 
         if entrada == "/inv":
@@ -1771,44 +1731,39 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
             items_no_inv = len(inventario)
             exibir_inventario()
 
-        elif entrada == "1" or entrada== "2":
-            limpar()
-            fase+=1
-
-        elif entrada == "a":
-            print(fase)
-
         elif entrada == "/help":
             limpar()
             exibir_help()
 
+        elif len(entrada) == 0:
+            print(" ")
+            limpar()
 
         elif entrada == "/sair":
             fim_sessao = time.time()
-            tempo_total = int(fim_sessao - inicio_sessao)  
+            tempo_total = int(fim_sessao - inicio_sessao)
 
             os.system("clear" if os.name != "nt" else "cls")
-
 
             horas = tempo_total // 3600
             minutos = (tempo_total % 3600) // 60
             segundos = tempo_total % 60
-            
+
             print("Saindo do programa...")
             print(f"Obrigado por jogar, {nome_usuario}!")
             print(f"Tempo total da sua aventura: {horas}h {minutos}m {segundos}s")
-            print(f"Fase final alcansada: {fase}")
-            print(f"Nivel maximo alcansado: {nivel}")
-            print(f"XP final alcansado: {xp}/100")
+            print(f"Fase final alcançada: {fase}")
+            print(f"Nível máximo alcançado: {nivel}")
+            print(f"XP final alcançado: {xp}/100")
             break
-            
+
         elif entrada == "/devs":
-           limpar()
-           exibir_devs()
+            limpar()
+            exibir_devs()
 
         elif entrada == "/renick" and nome_usuario is not None:
             limpar()
-            nome_usuario = trocar_nickname(nome_usuario) 
+            nome_usuario = trocar_nickname(nome_usuario)
 
         elif entrada == "/clear":
             limpar()
@@ -1818,15 +1773,15 @@ def iniciar_jogo(nome_usuario, raca_personagem,vida,defesa,velocidade,mana,items
             limpar()
             peso = calcular_peso_inventario()
             items_no_inv = len(inventario)
-            exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,raca_personagem,fome,ouro,peso,xp,nivel,armadura)
+            exibir_status(nome_usuario, vida, defesa, velocidade, mana, items_no_inv, fase, raca_personagem, fome, ouro, peso, xp, nivel, armadura)
 
         elif entrada == "/start":
             limpar()
             print('Você não pode usar o comando "/start", o jogo já iniciou!')
 
-        elif entrada=="/tabraca":
-             limpar()
-             exibir_tabeal_raca()
+        elif entrada == "/tabraca":
+            limpar()
+            exibir_tabeal_raca()
 
         elif entrada.startswith("/consumir"):
             limpar()
