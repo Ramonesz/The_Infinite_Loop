@@ -81,12 +81,15 @@ def exibir_help(): # Exibe o comando /help
 /tabraca: Mostra a tabela das racas;
 
 ----------- COMANDOS GAMEPLAY ----------------
-/inv      : Mostra o inventário do jogador;
-/sts      : Mostra os status do jogador;
-/consumir : Consome um item do inventário (ex: /consumir Maçã Crocante);
-/fabricar : Fabrica um item na mão, se tiver os materiais (ex: /fabricar corda);
-/buscar   : Mostra os itens do inventário de um tipo (ex: /buscar alimento);
-/ordenar  : Ordena o inventário por tipo, valor ou peso (ex: /ordenar valor_item);
+/inv : Abre o inventário do jogador. Cada item recebe um ID (ex: [01], [02]...).
+       De dentro dele, digite o ID de um item para ver os detalhes dele, ou
+       escolha uma das ações do painel:
+         [1] Usar / Consumir      [4] Ordenar / Filtrar   [7] Buscar Item
+         [2] Fabricar (na mão)    [5] Ver Detalhes        [8] Sair do Menu
+         [3] Descartar Item       [6] Equipar (arma/armadura)
+       Cada raça tem uma capacidade de peso máxima; carregar peso além do
+       limite deixa o jogador SOBRECARREGADO, reduzindo velocidade e ataque.
+/sts : Mostra os status do jogador, incluindo peso atual/máximo;
 
 ----------- DURANTE O COMBATE ----------------
 1    : Atacar;
@@ -116,19 +119,26 @@ def obter_raca():
     print("""
          
                             Escolha sua raca
-           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--          
-           |------------  vida | defesa | velocidade | mana |
-           | Humano    |  100  |   15   |     20     |   0  |
-           | Elfo      |   85  |    9   |     25     |  60  |
-           | Anao      |  130  |   24   |     12     |   0  |
-           | Goblin    |   70  |    8   |     30     |   0  |
-           | Draconato |  115  |   19   |     16     |  30  |
-           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--          
+           |    | Raça      | vida | defesa | velocidade | mana | peso max |
+           | [1]| Humano    |  100 |   15   |     20     |   0  |   30 kg  |
+           | [2]| Elfo      |   85 |    9   |     25     |  60  |   24 kg  |
+           | [3]| Anao      |  130 |   24   |     12     |   0  |   42 kg  |
+           | [4]| Goblin    |   70 |    8   |     30     |   0  |   20 kg  |
+           | [5]| Draconato |  115 |   19   |     16     |  30  |   36 kg  |
+           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+           Digite o NÚMERO da raça ou digite o nome dela.
            """)
+    opcoes_numero = {"1": "Humano", "2": "Elfo", "3": "Anao", "4": "Goblin", "5": "Draconato"}
     while True:
-        raca = input("->").lower()
+        raca = input("->").strip().lower()
 
-        if raca=="humano":
+        if raca in opcoes_numero:
+            raca_escolhida = opcoes_numero[raca]
+            print(f"\nRaca escolhida: {raca_escolhida}\n")
+            return raca_escolhida
+
+        elif raca=="humano":
              print(f"\nRaca escolhida: Humano\n")
              return "Humano"
 
@@ -149,7 +159,7 @@ def obter_raca():
              return "Draconato"
 
         else:
-             print("\nRaca nao identificada, veja a tebela a cima e escolha sua raca.\n")
+             print("\nRaca nao identificada, digite o numero (1 a 5) ou o nome da raca, veja a tabela a cima.\n")
 
         
 # Atributos globais ↓
@@ -161,7 +171,7 @@ fase=1
 # O inventário agora é um dicionário {chave_do_item: quantidade}, e não mais um set,
 # porque precisamos guardar quantidade de cada item (e buscar os dados dele em itens_jogo())
 inventario = {"espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2}
-items_no_inv = len(inventario)
+items_no_inv = sum(inventario.values())
 
 ouro=0
 fome = 100
@@ -174,7 +184,25 @@ velocidade = 0
 defesa = 0 
 mana = 0       
 
-ataque_jogador = 10 # dano base de ataque (evolui conforme a arma equipada / afiada)
+ATAQUE_BASE_DESARMADO = 10 # dano base "de mão" (sem arma nenhuma), igual ao valor original do jogo
+ataque_jogador = 10 # dano de ataque final (recalculado por recalcular_ataque() sempre que muda a arma/afiação)
+bonus_afiar = 0 # bônus permanente ganho ao afiar a arma na pedra de amolar
+arma_equipada = None # chave interna da arma equipada, ou None se estiver desarmado
+armadura_equipada = None # chave interna da armadura equipada, ou None se estiver sem armadura
+peso_maximo_jogador = 30 # capacidade de peso, definida de verdade em iniciar_jogo() de acordo com a raça
+
+
+def recalcular_ataque():
+    """Recalcula o ataque_jogador a partir do dano base desarmado + bônus de
+    afiar + bônus da arma equipada (a arma SOMA ao dano base, nunca substitui
+    ele - assim equipar uma arma nunca deixa o jogador mais fraco do que
+    lutar desarmado)."""
+    global ataque_jogador
+    bonus_arma = 0
+    if arma_equipada is not None:
+        bonus_arma = itens_jogo(arma_equipada).get("dano_item", 0)
+    ataque_jogador = ATAQUE_BASE_DESARMADO + bonus_afiar + bonus_arma
+    return ataque_jogador
 
 # Listas dos itens que cada vendedor tem disponível para venda
 ITENS_OTTO = ["carne_assada", "carne_crua", "maca_crocante", "bagas_vermelhas", "armadura_de_couro", "pocao_de_cura_pequena", "arco_de_caca"]
@@ -381,12 +409,70 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
     return item
 
 
+# Mapeia o tipo_item interno (usado na lógica) para uma categoria mais curta,
+# usada só na exibição da tela de inventário.
+CATEGORIAS_EXIBICAO = {
+    "arma": "Equipamento",
+    "armadura": "Equipamento",
+    "consumivel": "Consumível",
+    "alimento": "Alimento",
+    "recurso": "Material",
+    "drop": "Material",
+    "inusitado": "Especial",
+    "nenhum": "-",
+}
+
+# Descrição de cada item, mostrada no painel de detalhes do inventário.
+DESCRICOES_ITENS = {
+    "espada_de_madeira": "Uma espada simples de madeira. Fraca, mas fácil de fabricar.",
+    "adaga_cega": "Uma adaga velha e sem fio. Rápida, mas causa pouco dano.",
+    "espada_de_ferro": "Espada forjada em ferro. Precisa ser fabricada na forja de Gol.",
+    "arco_de_caca": "Arco de caça leve, feito com madeira de carvalho e teia de aranha.",
+    "tunica_de_pano": "Uma túnica simples de pano, oferece pouca proteção.",
+    "armadura_de_couro": "Armadura feita de pele de lobo e teia de aranha, resistente e leve.",
+    "escudo_de_madeira": "Escudo simples de madeira, ajuda a bloquear golpes.",
+    "pocao_de_cura_pequena": "Poção que restaura uma pequena quantidade de vida ao ser consumida.",
+    "pocao_de_cura_grande": "Poção que restaura uma grande quantidade de vida ao ser consumida.",
+    "pocao_de_mana_pequena": "Poção que restaura uma pequena quantidade de mana ao ser consumida.",
+    "antidoto": "Cura o efeito de veneno quando consumido.",
+    "bagas_vermelhas": "Bagas silvestres colhidas na floresta. Matam um pouco da fome.",
+    "baga_brilhante": "Baga mágica encontrada nas cavernas, recupera fome e um pouco de mana.",
+    "carne_crua": "Carne de caça, ainda crua. Mata a fome, mas não é o ideal.",
+    "maca_crocante": "Uma maçã fresca e crocante. Mata a fome e recupera um pouco de vida.",
+    "carne_assada": "Carne assada no fogo, uma refeição completa que mata bastante fome.",
+    "madeira_simples": "Madeira comum, usada como material básico de fabricação.",
+    "madeira_de_carvalho": "Madeira de carvalho, mais resistente que a madeira simples.",
+    "carvao": "Carvão usado como combustível em fabricações na forja.",
+    "minerio_de_ferro": "Minério bruto de ferro, usado para forjar equipamentos.",
+    "corda": "Uma corda simples, feita de teia de aranha trançada.",
+    "gelatina_verde": "Resíduo viscoso deixado por um Slime Verde derrotado.",
+    "pele_de_lobo": "Pele de lobo, usada na fabricação de armaduras de couro.",
+    "teia_de_aranha": "Teia resistente de aranha, útil para fabricar diversos itens.",
+    "folha_venenosa": "Folha tóxica, usada para preparar antídotos.",
+    "asa_de_morcego": "Asa de morcego, ingrediente usado em algumas fabricações.",
+    "pedra_batata": "Uma pedra que parece estranhamente com uma batata. Não serve pra nada.",
+    "anel_de_vida": "Um anel raro e poderoso, cura quase toda a vida ao ser consumido.",
+}
+
+
+def obter_categoria_exibicao(item):
+    return CATEGORIAS_EXIBICAO.get(item.get("tipo_item"), "Outro")
+
+
+def obter_descricao_item(nome_item, item):
+    return DESCRICOES_ITENS.get(nome_item, f"Um {item['nome_item']}, sem descrição detalhada.")
+
+
 def calcular_peso_inventario(): # Soma o peso_item de cada item do inventário pela quantidade
     total = 0
     for nome_item, quantidade in inventario.items():
         item = itens_jogo(nome_item)
         total += item["peso_item"] * quantidade
     return total
+
+
+def calcular_total_itens_inventario(): # Soma a QUANTIDADE de cada item, não a quantidade de tipos diferentes
+    return sum(inventario.values())
 
 
 def pesquisar_item_por_tipo(tipo): # Retorna só os itens do inventário daquele tipo_item
@@ -432,6 +518,54 @@ def buscar_item_inventario_por_nome(nome_digitado):
         if itens_jogo(chave)["nome_item"].strip().lower() == nome_normalizado:
             return chave
     return None
+
+
+def resolver_id_item(id_digitado):
+    """Resolve um ID digitado (ex: '01' ou '1') para a chave interna do item,
+    de acordo com a ordem atual de exibição do inventário. Retorna None se o
+    ID não existir."""
+    try:
+        indice = int(id_digitado)
+    except ValueError:
+        return None
+
+    chaves = list(inventario.keys())
+    if 1 <= indice <= len(chaves):
+        return chaves[indice - 1]
+    return None
+
+
+def equipar_item(nome_item, armadura_atual):
+    """Equipa uma arma (soma o dano dela ao ataque base) ou uma armadura
+    (define a defesa vinda da armadura). Retorna (armadura_atualizada, mensagem).
+    Guarda em arma_equipada/armadura_equipada qual item está em uso, pra poder
+    ser mostrado no inventário e permitir desequipar depois."""
+    global arma_equipada, armadura_equipada
+    item = itens_jogo(nome_item)
+
+    if item["tipo_item"] == "arma":
+        ataque_antes = ataque_jogador
+        arma_equipada = nome_item
+        novo_ataque = recalcular_ataque()
+        diferenca = novo_ataque - ataque_antes
+        tag_diferenca = f"(+{diferenca})" if diferenca >= 0 else f"({diferenca})"
+        return armadura_atual, f"{Cores.VERDE} Você equipou {item['nome_item']}! Ataque total agora é {novo_ataque} {tag_diferenca}.{Cores.RESET}"
+    elif item["tipo_item"] == "armadura":
+        armadura_equipada = nome_item
+        nova_armadura = item["defesa_item"]
+        return nova_armadura, f"{Cores.VERDE} Você equipou {item['nome_item']}! Sua armadura agora dá {nova_armadura} de defesa.{Cores.RESET}"
+    else:
+        return armadura_atual, f"{Cores.VERMELHO} {item['nome_item']} não pode ser equipado.{Cores.RESET}"
+
+
+def desequipar_tudo(armadura_atual):
+    """Guarda a arma e a armadura equipadas (volta pro ataque desarmado + bônus
+    de afiar, e defesa de armadura 0)."""
+    global arma_equipada, armadura_equipada
+    arma_equipada = None
+    armadura_equipada = None
+    novo_ataque = recalcular_ataque()
+    return 0, f"{Cores.AMARELO} Você guardou sua arma e armadura. Ataque agora é {novo_ataque} (desarmado), armadura 0.{Cores.RESET}"
 
 
 def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome, velocidade=None, status=None):
@@ -527,45 +661,283 @@ def fabricar_item(nome_item, local="mao"):
     return f"{Cores.VERDE} Você fabricou: {item['nome_item']}!{Cores.RESET}"
 
 
-def retirar_item_inv():
+def _imprimir_tabela_inventario(ouro):
+    """Desenha a tabela do inventário no estilo novo (cabeçalho, linha de ouro/peso,
+    colunas com ID, nome, categoria, quantidade e peso). Usada tanto pelo modo
+    de leitura (exibir_inventario_resumo) quanto pelo hub completo (exibir_inventario)."""
+    peso_atual = calcular_peso_inventario()
+    sobrecarregado = esta_sobrecarregado(peso_atual, peso_maximo_jogador)
+    cor_peso = Cores.VERMELHO if sobrecarregado else Cores.RESET
+    tag_sobrecarga = f" {Cores.VERMELHO}[SOBRECARREGADO]{Cores.RESET}" if sobrecarregado else ""
+
+    nome_arma = itens_jogo(arma_equipada)["nome_item"] if arma_equipada else "Nenhuma (desarmado)"
+    nome_armadura = itens_jogo(armadura_equipada)["nome_item"] if armadura_equipada else "Nenhuma"
+
+    largura = 80
+    print("=" * largura)
+    print("INVENTÁRIO DO JOGADOR".center(largura))
+    print("=" * largura)
+    print(f" OURO: {Cores.AMARELO}{ouro}g{Cores.RESET} | PESO: {cor_peso}{peso_atual} / {peso_maximo_jogador} kg{Cores.RESET}{tag_sobrecarga} | ITENS: {calcular_total_itens_inventario()}")
+    print(f" {Cores.CIANO}EQUIPADO{Cores.RESET} -> Arma: {nome_arma} (ataque {ataque_jogador}) | Armadura: {nome_armadura}")
+    print("-" * largura)
+    print(f" {'ID':<4}| {'NOME DO ITEM':<26}| {'CAT.':<12}| {'QTD':<5}| PESO")
+    print("-" * largura)
+
+    if not inventario:
+        print(" (seu inventário está vazio)")
+    else:
+        for indice, (nome_item, quantidade) in enumerate(inventario.items(), start=1):
+            item = itens_jogo(nome_item)
+            categoria = obter_categoria_exibicao(item)
+            tag_equipado = ""
+            if nome_item == arma_equipada or nome_item == armadura_equipada:
+                tag_equipado = f" {Cores.VERDE}(Equipado){Cores.RESET}"
+            print(f"[{indice:02d}]| {item['nome_item']:<26}| {categoria:<12}| {quantidade:<5}| {item['peso_item']} kg{tag_equipado}")
+    print("=" * largura)
+
+
+def exibir_inventario_resumo(ouro):
+    """Versão somente leitura do inventário (sem painel de ações). Usada para
+    'espiar' o inventário durante o combate ou no meio de uma pergunta
+    (sim/nao, conversar/ignorar) sem gastar o turno/ação."""
+    print()
+    _imprimir_tabela_inventario(ouro)
+    print()
+
+
+def construir_lista_efeitos(item):
+    """Monta a lista de efeitos de um item em texto legível (ex: '+10 de fome',
+    '+2 de vida'). Usada no painel de detalhes do inventário, na listagem de
+    consumo (inventário e combate) - centraliza a descrição num único lugar."""
+    efeitos = []
+    if "dano_item" in item:
+        efeitos.append(f"+{item['dano_item']} de dano de ataque (se equipado)")
+    if "defesa_item" in item:
+        efeitos.append(f"+{item['defesa_item']} de defesa (se equipado)")
+    if "cura_vida_item" in item:
+        efeitos.append(f"+{item['cura_vida_item']} de vida")
+    if "cura_mana_item" in item:
+        efeitos.append(f"+{item['cura_mana_item']} de mana")
+    if "fome_item" in item:
+        efeitos.append(f"+{item['fome_item']} de fome")
+    if "vida_bonus_item" in item:
+        efeitos.append(f"+{item['vida_bonus_item']} de vida (bônus)")
+    if "mana_bonus_item" in item:
+        efeitos.append(f"+{item['mana_bonus_item']} de mana (bônus)")
+    if "cura_status_item" in item:
+        efeitos.append(f"cura o status: {item['cura_status_item']}")
+    if not efeitos:
+        efeitos.append("Nenhum efeito direto (item de material/uso em receitas).")
+    return efeitos
+
+
+def _exibir_detalhes_item(chave):
+    item = itens_jogo(chave)
+    quantidade = inventario.get(chave, 0)
+    categoria = obter_categoria_exibicao(item)
+    descricao = obter_descricao_item(chave, item)
+    efeitos = construir_lista_efeitos(item)
+
+    largura = 80
+    print("=" * largura)
+    print("DETALHES DO ITEM".center(largura))
+    print("-" * largura)
+    print(f" Item Selecionado: {item['nome_item']} (x{quantidade}) [{categoria}]")
+    print(f" Descrição: {descricao}")
+    print(f" Efeitos: {', '.join(efeitos)}")
+    print(f" Valor: {item['valor_item']} ouro | Peso unitário: {item['peso_item']} kg")
+    print("=" * largura)
+
+
+def listar_itens_craftaveis(local):
+    """Retorna a lista (chave, item) de todos os itens fabricáveis num
+    determinado local ('mao' ou 'forja'), na ordem em que aparecem em
+    DESCRICOES_ITENS (que cobre todos os itens do jogo)."""
+    resultado = []
+    for chave in DESCRICOES_ITENS:
+        item = itens_jogo(chave)
+        if item.get("craftavel_item") and item.get("local_fabricacao_item") == local:
+            resultado.append((chave, item))
+    return resultado
+
+
+def _linha_status_receita(chave, item):
+    """Retorna (tag_status, texto_da_receita) de um item craftável, indicando
+    se o jogador já tem os materiais necessários ou não."""
+    pode, _ = pode_fabricar_item(chave, item.get("local_fabricacao_item", "mao"))
+    status = f"{Cores.VERDE}[OK]{Cores.RESET}" if pode else f"{Cores.VERMELHO}[FALTAM MATERIAIS]{Cores.RESET}"
+    receita = ", ".join(
+        f"{quantidade}x {itens_jogo(ingrediente)['nome_item']}"
+        for ingrediente, quantidade in item.get("receita_item", {}).items()
+    )
+    return status, receita
+
+
+def exibir_menu_fabricacao_mao():
+    """Mostra os itens fabricáveis na mão (o jogador pode escolher um pra
+    fabricar aqui mesmo) e, abaixo, só como referência, os que existem no jogo
+    mas exigem a forja de Gol. Retorna a lista (chave, item) dos itens de mão,
+    na ordem exibida, pra permitir escolher pelo número mostrado."""
+    itens_mao = listar_itens_craftaveis("mao")
+    itens_forja = listar_itens_craftaveis("forja")
+
+    largura = 80
+    print("=" * largura)
+    print("FABRICAÇÃO NA MÃO (disponível agora, aqui no inventário)".center(largura))
+    print("-" * largura)
+    if not itens_mao:
+        print(" (nenhum item fabricável na mão no momento)")
+    for indice, (chave, item) in enumerate(itens_mao, start=1):
+        status, receita = _linha_status_receita(chave, item)
+        print(f"[{indice:02d}] {item['nome_item']:<24} Requer: {receita:<38} {status}")
+
+    print("-" * largura)
+    print("SÓ NA FORJA DE GOL (referência - vá até a forja para fabricar)".center(largura))
+    print("-" * largura)
+    for chave, item in itens_forja:
+        status, receita = _linha_status_receita(chave, item)
+        print(f"      {item['nome_item']:<24} Requer: {receita:<38} {status}")
+    print("=" * largura)
+
+    return itens_mao
+
+
+def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, armadura, ouro):
+    """
+    Hub completo do inventário, no novo layout com ID por item (01, 02...) e
+    painel de ações numerado (1 a 8). Permite: usar/consumir, fabricar na mão,
+    descartar, ordenar/filtrar, ver detalhes, equipar (arma/armadura), buscar
+    por tipo e sair. Fabricação em forja continua exigindo estar na forja
+    (ver forja_interativa). Retorna vida, mana, fome, velocidade, armadura
+    atualizados, já que usar/equipar itens pode alterá-los.
+    """
     while True:
-        entrada_inv = str(input("""
-    ---Voce deseja tirar algum item do inventario?---
-                sim                nao
+        limpar()
+        print()
+        _imprimir_tabela_inventario(ouro)
+        print("""
+                              PAINEL DE AÇÕES
+--------------------------------------------------------------------------------
+ [1] Usar / Consumir      [4] Ordenar / Filtrar    [7] Buscar Item
+ [2] Fabricar (Crafting)  [5] Ver Detalhes         [8] Sair do Menu
+ [3] Descartar Item       [6] Equipar (arma/armadura)
+================================================================================""")
+        escolha = input(" Digite a opção desejada ou ID do item: ").strip().lower()
 
-    """)).strip().lower()
-            
-        if entrada_inv == "sim":
-            item_digitado = str(input("Qual(is) item(s) vc deseja retirar do seu inventario? ")).strip()
-            chave = buscar_item_inventario_por_nome(item_digitado)
+        # Digitar direto o ID do item (ex: 01) já mostra os detalhes dele
+        if escolha.isdigit() and 1 <= int(escolha) <= len(inventario) and len(escolha) >= 2:
+            chave = resolver_id_item(escolha)
+            if chave:
+                _exibir_detalhes_item(chave)
+            continue
 
-            if chave is not None:
+        if escolha in ("8", "sair"):
+            break
+
+        elif escolha in ("1", "usar", "consumir"):
+            if not inventario:
+                print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                continue
+            print("\n--------- ITENS QUE PODEM SER USADOS/CONSUMIDOS ---------")
+            algum_consumivel = False
+            for indice, (nome_item_inv, quantidade) in enumerate(inventario.items(), start=1):
+                if pode_consumir_item(nome_item_inv):
+                    algum_consumivel = True
+                    item_inv = itens_jogo(nome_item_inv)
+                    efeito_txt = ", ".join(construir_lista_efeitos(item_inv))
+                    print(f"[{indice:02d}] {item_inv['nome_item']:<26} x{quantidade:<3} -> {efeito_txt}")
+            if not algum_consumivel:
+                print(" (nenhum item consumível no inventário)")
+            print("-----------------------------------------------------------")
+
+            id_digitado = input(" Digite o ID do item que deseja usar/consumir: ").strip()
+            chave = resolver_id_item(id_digitado)
+            if chave is None:
+                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
+            else:
+                vida, mana, fome, velocidade, _status_fora_combate, mensagem = consumir_item(
+                    chave, vida, vida_maxima, mana, mana_maxima, fome, velocidade, {}
+                )
+                print(mensagem)
+
+        elif escolha in ("2", "fabricar"):
+            itens_mao = exibir_menu_fabricacao_mao()
+            if not itens_mao:
+                continue
+            id_digitado = input(" Digite o número do item para fabricar na mão (ou 'cancelar'): ").strip().lower()
+            if id_digitado == "cancelar":
+                continue
+            try:
+                indice = int(id_digitado)
+                chave_escolhida = itens_mao[indice - 1][0]
+            except (ValueError, IndexError):
+                print(f"{Cores.VERMELHO} Número inválido.{Cores.RESET}")
+            else:
+                print(fabricar_item(chave_escolhida, local="mao"))
+
+        elif escolha in ("3", "descartar"):
+            if not inventario:
+                print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                continue
+            id_digitado = input(" Digite o ID do item que deseja descartar: ").strip()
+            chave = resolver_id_item(id_digitado)
+            if chave is None:
+                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
+            else:
+                item = itens_jogo(chave)
                 inventario[chave] -= 1
                 if inventario[chave] <= 0:
                     del inventario[chave]
-                print(f"Seu inventario ficou assim: {inventario}")
+                print(f"{Cores.AMARELO} Você descartou 1x {item['nome_item']}.{Cores.RESET}")
+
+        elif escolha in ("4", "ordenar", "filtrar"):
+            criterio = input(" Ordenar por (tipo_item / valor_item / peso_item): ").strip() or "tipo_item"
+            ordenar_inventario_por(criterio)
+            print(f"Inventário ordenado por {criterio}.")
+
+        elif escolha in ("5", "detalhes"):
+            if not inventario:
+                print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                continue
+            id_digitado = input(" Digite o ID do item para ver os detalhes: ").strip()
+            chave = resolver_id_item(id_digitado)
+            if chave is None:
+                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
             else:
-                print(f"{Cores.VERMELHO}Esse item não está no seu inventário.{Cores.RESET}")
-                
-            break
-        elif entrada_inv == "nao":
-            print("\nVoltando")
-            break
+                _exibir_detalhes_item(chave)
+
+        elif escolha in ("6", "equipar"):
+            if not inventario:
+                print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                continue
+            id_digitado = input(" Digite o ID da arma ou armadura que deseja equipar: ").strip()
+            chave = resolver_id_item(id_digitado)
+            if chave is None:
+                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
+            else:
+                armadura, mensagem = equipar_item(chave, armadura)
+                print(mensagem)
+
+        elif escolha in ("7", "buscar"):
+            tipo = input(" Buscar por tipo (ex: alimento, arma, consumivel, recurso): ").strip()
+            encontrados = pesquisar_item_por_tipo(tipo)
+            if encontrados:
+                for nome_item, quantidade in encontrados.items():
+                    item = itens_jogo(nome_item)
+                    print(f" {item['nome_item']} x{quantidade} - {item['valor_item']} ouro - {item['peso_item']} kg")
+            else:
+                print(f"Nenhum item do tipo '{tipo}' no inventário.")
+
         else:
-            print('Comando errado digite "sim" ou "nao".')
-            
-        
-def exibir_inventario():
-    print("\n--------- INVENTÁRIO ---------")
-    for nome_item, quantidade in inventario.items():
-        item = itens_jogo(nome_item)
-        print(f"{Cores.CIANO}{item['nome_item']:<28}{Cores.RESET} x{quantidade:<3} [{item['tipo_item']}]  {item['valor_item']} ouro {item['peso_item']} peso")
-    print(f"Peso total: {calcular_peso_inventario()}")
-    print("-------------------------------\n")
-    retirar_item_inv()
+            print(f'{Cores.VERMELHO}Opção inválida. Digite um número de 1 a 8, ou o ID de um item.{Cores.RESET}')
+
+    return vida, mana, fome, velocidade, armadura
 
 
 def exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,raca_usuario,fome,ouro,peso,xp,nivel,armadura):
+    sobrecarregado = esta_sobrecarregado(peso, peso_maximo_jogador)
+    cor_peso = Cores.VERMELHO if sobrecarregado else Cores.RESET
+    tag_peso = f" {Cores.VERMELHO}(SOBRECARREGADO! Velocidade e ataque reduzidos){Cores.RESET}" if sobrecarregado else ""
     print(f"""              
             Nome:..........{nome_usuario}
             Raca:..........{raca_usuario}
@@ -573,7 +945,7 @@ def exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,rac
             Vida:..........{Cores.VERDE if vida > 30 else Cores.VERMELHO}{vida}{Cores.RESET}
             Fome:..........{fome}/100
             Ouro:..........{Cores.AMARELO}{ouro}{Cores.RESET}
-            Peso:..........{peso}
+            Peso:..........{cor_peso}{peso} / {peso_maximo_jogador} kg{Cores.RESET}{tag_peso}
             XP:............{xp}/100
             Nível:.........{nivel}
             Itens no inv:..{items_no_inv}/100
@@ -588,6 +960,12 @@ def exibir_barra_status(vida, vida_maxima, fome):
     cor_vida = Cores.VERDE if vida > vida_maxima * 0.3 else Cores.VERMELHO
     cor_fome = Cores.RESET if fome > 20 else Cores.VERMELHO
     print(f"\n{cor_vida} Vida: {vida}/{vida_maxima}{Cores.RESET} {cor_fome} Fome: {fome}/100{Cores.RESET}\n")
+
+
+def exibir_rodape_fase():
+    """Rodapé fixo mostrado nas telas de fase, lembrando o jogador do que ele
+    pode fazer sem precisar consultar o /help toda hora."""
+    print(f"{Cores.CIANO}[ENTER] Continuar   [/inv] Inventário   [/sts] Status   [/help] Ajuda{Cores.RESET}")
 
 def exibir_raca(raca_personagem):
      print(f"Sua raca e: {raca_personagem}")
@@ -605,6 +983,44 @@ def definir_atributos(raca):
         return 115, 19, 16, 30
     else:
         return 100, 10, 10, 0
+
+
+# Capacidade de peso máxima de cada raça, em kg. Baseada nos atributos de cada
+# raça: quem tem mais defesa/vida (corpo mais robusto) aguenta mais peso,
+# quem tem mais velocidade (corpo mais leve/ágil) aguenta menos.
+PESO_MAXIMO_RACA = {
+    "Humano": 30,
+    "Elfo": 24,
+    "Anao": 42,
+    "Goblin": 20,
+    "Draconato": 36,
+}
+
+# Percentual de penalidade quando o jogador está acima do peso máximo:
+# a velocidade (usada para fugir) e o ataque (usado para calcular dano) caem.
+PENALIDADE_VELOCIDADE_SOBRECARGA = 0.6  # fica com 60% da velocidade
+PENALIDADE_ATAQUE_SOBRECARGA = 0.8      # fica com 80% do ataque
+
+
+def definir_peso_maximo(raca):
+    return PESO_MAXIMO_RACA.get(raca, 30)
+
+
+def esta_sobrecarregado(peso_atual, peso_maximo):
+    return peso_atual > peso_maximo
+
+
+def aplicar_penalidade_peso(velocidade, ataque):
+    """Recebe velocidade/ataque base e retorna os valores efetivos, já considerando
+    a sobrecarga (se o peso do inventário estiver acima do peso máximo da raça).
+    Não altera a velocidade/ataque base do jogador - é só um efeito temporário
+    enquanto ele estiver carregando peso demais."""
+    peso_atual = calcular_peso_inventario()
+    if esta_sobrecarregado(peso_atual, peso_maximo_jogador):
+        velocidade_efetiva = max(1, int(velocidade * PENALIDADE_VELOCIDADE_SOBRECARGA))
+        ataque_efetivo = max(1, int(ataque * PENALIDADE_ATAQUE_SOBRECARGA))
+        return velocidade_efetiva, ataque_efetivo, True
+    return velocidade, ataque, False
 
 def exibir_tabeal_raca():
          print("""
@@ -1794,11 +2210,13 @@ def perder_fome(fome, quantidade, vida):
 
 
 def afiar_espada():
-    """Aumenta permanentemente o dano de ataque do jogador."""
-    global ataque_jogador
+    """Aumenta permanentemente o dano de ataque do jogador (bônus que persiste
+    mesmo trocando de arma depois)."""
+    global bonus_afiar
     bonus = 3
-    ataque_jogador += bonus
-    print(f"{Cores.VERDE} Você afia sua arma na pedra de amolar! Dano de ataque +{bonus} (agora {ataque_jogador}).{Cores.RESET}")
+    bonus_afiar += bonus
+    novo_ataque = recalcular_ataque()
+    print(f"{Cores.VERDE} Você afia sua arma na pedra de amolar! Dano de ataque +{bonus} (agora {novo_ataque}).{Cores.RESET}")
 
 
 def vender_interativo(ouro):
@@ -1882,14 +2300,32 @@ sair                 : sai da loja
 
 def forja_interativa():
     """Loop de fabricação de itens de forja (ex: espada_de_ferro) na forja de Gol."""
-    print("\n--------- FORJA DE GOL ---------")
-    print("Digite o nome do item para fabricar na forja (ex: espada_de_ferro), ou 'sair' para sair.")
+    itens_forja = listar_itens_craftaveis("forja")
+    largura = 80
+
     while True:
-        escolha = input("-> ").strip().lower()
+        limpar()
+        print("=" * largura)
+        print("FORJA DE GOL".center(largura))
+        print("-" * largura)
+        if not itens_forja:
+            print(" (nenhum item fabricável na forja no momento)")
+        for indice, (chave, item) in enumerate(itens_forja, start=1):
+            status, receita = _linha_status_receita(chave, item)
+            print(f"[{indice:02d}] {item['nome_item']:<24} Requer: {receita:<38} {status}")
+        print("=" * largura)
+
+        escolha = input("Digite o número do item para fabricar, ou 'sair': ").strip().lower()
         if escolha == "sair":
             print("Você sai da forja.")
             break
-        print(fabricar_item(escolha, local="forja"))
+        try:
+            indice = int(escolha)
+            chave_escolhida = itens_forja[indice - 1][0]
+        except (ValueError, IndexError):
+            print(f"{Cores.VERMELHO} Número inválido.{Cores.RESET}")
+            continue
+        print(fabricar_item(chave_escolhida, local="forja"))
 
 
 def resolver_baus_gollum(ouro, vida):
@@ -1962,13 +2398,13 @@ def perguntar_opcao(pergunta, opcao_positiva, opcao_negativa, vida=0, vida_maxim
             limpar()
             if texto_fase:
                 print(texto_fase, end="")
-            exibir_inventario()
+            exibir_inventario_resumo(ouro)
         elif resposta == "/sts":
             limpar()
             if texto_fase:
                 print(texto_fase, end="")
             peso_atual = calcular_peso_inventario()
-            items_no_inv_atual = len(inventario)
+            items_no_inv_atual = calcular_total_itens_inventario()
             exibir_status(nome_usuario, vida, defesa, velocidade, mana, items_no_inv_atual, fase,
                           raca_personagem, fome, ouro, peso_atual, xp, nivel, armadura)
         elif resposta == "/help":
@@ -1996,15 +2432,23 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
 
     while vida_monstro > 0 and vida > 0:
 
+        # A cada turno recalcula se o jogador está sobrecarregado (o peso pode
+        # mudar em combate, já que consumir item também é permitido em batalha).
+        velocidade_efetiva, ataque_efetivo, sobrecarregado = aplicar_penalidade_peso(velocidade, ataque_jogador)
+
         #TURNO DO JOGADOR
         tags_status = ""
         if "veneno" in status_jogador:
             tags_status += f" {Cores.MAGENTA}ENVENENADO{Cores.RESET}"
         if "fogo" in status_jogador:
             tags_status += f" {Cores.VERMELHO}PEGANDO FOGO{Cores.RESET}"
+        if sobrecarregado:
+            tags_status += f" {Cores.AMARELO}SOBRECARREGADO{Cores.RESET}"
 
         cor_vida_jogador = Cores.VERDE if vida > vida_maxima * 0.3 else Cores.VERMELHO
         print(f"\nSua vida: {cor_vida_jogador}{vida}/{vida_maxima}{Cores.RESET}   Fome: {fome}/100   Vida do {dados_monstro['nome_monstro']}: {max(vida_monstro, 0)}{tags_status}")
+        if sobrecarregado:
+            print(f"{Cores.AMARELO} Você está carregando peso demais! Velocidade e ataque estão reduzidos.{Cores.RESET}")
         print("""
         --- Seu turno ---
         1    - Atacar
@@ -2023,7 +2467,7 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
             turno_gasto = False
 
         elif escolha == "1":
-            dano_jogador, critico_jogador = calcular_dano(ataque_jogador, dados_monstro['defesa_monstro'])
+            dano_jogador, critico_jogador = calcular_dano(ataque_efetivo, dados_monstro['defesa_monstro'])
             vida_monstro -= dano_jogador
 
             if critico_jogador:
@@ -2064,7 +2508,8 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
                 return vida, vida_maxima, xp, ouro, nivel, mana, fome, "morreu"
 
             # quanto mais rápido o jogador for em relação ao monstro, maior a chance de fugir
-            chance_fuga = 0.5 + (velocidade - dados_monstro['velocidade_monstro']) * 0.02
+            # (usa a velocidade efetiva, já reduzida se o jogador estiver sobrecarregado)
+            chance_fuga = 0.5 + (velocidade_efetiva - dados_monstro['velocidade_monstro']) * 0.02
             chance_fuga = max(0.1, min(0.9, chance_fuga))  # trava entre 10% e 90%
 
             if random.random() < chance_fuga:
@@ -2084,16 +2529,8 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
                 print("\n--------- ITENS CONSUMÍVEIS ---------")
                 for nome_item_inv, quantidade in itens_consumiveis.items():
                     item_inv = itens_jogo(nome_item_inv)
-                    efeito_txt = []
-                    if "cura_vida_item" in item_inv:
-                        efeito_txt.append(f"+{item_inv['cura_vida_item']}")
-                    if "cura_mana_item" in item_inv:
-                        efeito_txt.append(f"+{item_inv['cura_mana_item']}")
-                    if "fome_item" in item_inv:
-                        efeito_txt.append(f"+{item_inv['fome_item']}")
-                    if "cura_status_item" in item_inv:
-                        efeito_txt.append(f"cura {item_inv['cura_status_item']}")
-                    print(f"{Cores.CIANO}{item_inv['nome_item']:<28}{Cores.RESET} x{quantidade:<3} ({', '.join(efeito_txt)})")
+                    efeito_txt = ", ".join(construir_lista_efeitos(item_inv))
+                    print(f"{Cores.CIANO}{item_inv['nome_item']:<28}{Cores.RESET} x{quantidade:<3} ({efeito_txt})")
                 print("-----------------------------------------")
                 nome_item_digitado = input("Qual item deseja usar? (nome do item / cancelar): ").strip()
                 if nome_item_digitado.lower() == "cancelar":
@@ -2109,11 +2546,7 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
                         print(mensagem)
 
         elif escolha == "/inv":
-            print("\n--------- INVENTÁRIO ---------")
-            for nome_item_inv, quantidade in inventario.items():
-                item_inv = itens_jogo(nome_item_inv)
-                print(f"{Cores.CIANO}{item_inv['nome_item']:<28}{Cores.RESET} x{quantidade}")
-            print("-------------------------------")
+            exibir_inventario_resumo(ouro)
             turno_gasto = False
 
         elif escolha == "/sts":
@@ -2339,12 +2772,21 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
 
 
 def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, items_no_inv, fase, fome, ouro, peso, xp, nivel, armadura):
+    global peso_maximo_jogador, arma_equipada, armadura_equipada
     limpar()
     inicio_sessao = time.time()
 
     # vida e mana no momento em que o jogo começa viram o "máximo"
     vida_maxima = vida
     mana_maxima = mana
+
+    # peso máximo que o jogador consegue carregar, de acordo com a raça escolhida
+    peso_maximo_jogador = definir_peso_maximo(raca_personagem)
+
+    # o jogador já começa com a Espada de Madeira equipada, já que ela vem no inventário inicial
+    arma_equipada = "espada_de_madeira" if "espada_de_madeira" in inventario else None
+    armadura_equipada = None
+    recalcular_ataque()
 
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
     while True:
@@ -2387,6 +2829,7 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
 
         # Mostra vida e fome resumidas assim que o jogador ganha o controle nesta fase
         exibir_barra_status(vida, vida_maxima, fome)
+        exibir_rodape_fase()
 
         # Loop de comandos dentro da MESMA fase: o jogador pode usar /inv, /sts, etc
         # livremente sem que isso avance a fase. A fase só avança quando o jogador
@@ -2405,13 +2848,16 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
             elif entrada == "/inv":
                 limpar()
                 print(texto_fase, end="")
-                items_no_inv = len(inventario)
-                exibir_inventario()
+                vida, mana, fome, velocidade, armadura = exibir_inventario(
+                    vida, vida_maxima, mana, mana_maxima, fome, velocidade, armadura, ouro
+                )
+                exibir_rodape_fase()
 
             elif entrada == "/help":
                 limpar()
                 print(texto_fase, end="")
                 exibir_help()
+                exibir_rodape_fase()
 
             elif entrada == "/sair":
                 sair_do_jogo = True
@@ -2420,11 +2866,13 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
                 limpar()
                 print(texto_fase, end="")
                 exibir_devs()
+                exibir_rodape_fase()
 
             elif entrada == "/renick" and nome_usuario is not None:
                 limpar()
                 print(texto_fase, end="")
                 nome_usuario = trocar_nickname(nome_usuario)
+                exibir_rodape_fase()
 
             elif entrada == "/clear":
                 # /clear é um pedido explícito de limpar a tela, então aqui não
@@ -2436,13 +2884,15 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
                 limpar()
                 print(texto_fase, end="")
                 peso = calcular_peso_inventario()
-                items_no_inv = len(inventario)
+                items_no_inv = calcular_total_itens_inventario()
                 exibir_status(nome_usuario, vida, defesa, velocidade, mana, items_no_inv, fase, raca_personagem, fome, ouro, peso, xp, nivel, armadura)
+                exibir_rodape_fase()
 
             elif entrada == "/start":
                 limpar()
                 print(texto_fase, end="")
                 print(f'{Cores.VERMELHO}Você não pode usar o comando "/start", o jogo já iniciou!{Cores.RESET}')
+                exibir_rodape_fase()
 
             elif entrada == "a":
                 print(fase)
@@ -2451,62 +2901,13 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
                 limpar()
                 print(texto_fase, end="")
                 exibir_tabeal_raca()
-
-            elif entrada.startswith("/consumir"):
-                limpar()
-                print(texto_fase, end="")
-                partes = entrada.split(" ", 1)
-                if len(partes) < 2:
-                    print("Use assim: /consumir nome do item (ex: /consumir Maçã Crocante)")
-                else:
-                    nome_item_digitado = partes[1].strip()
-                    chave = buscar_item_inventario_por_nome(nome_item_digitado)
-                    if chave is None:
-                        print(f"{Cores.VERMELHO} Você não possui um item chamado '{nome_item_digitado}'.{Cores.RESET}")
-                    else:
-                        vida, mana, fome, velocidade, _status_fora_combate, mensagem = consumir_item(
-                            chave, vida, vida_maxima, mana, mana_maxima, fome, velocidade, {}
-                        )
-                        print(mensagem)
-
-            elif entrada.startswith("/fabricar"):
-                limpar()
-                print(texto_fase, end="")
-                partes = entrada.split(" ", 1)
-                if len(partes) < 2:
-                    print("Use assim: /fabricar nome_do_item (ex: /fabricar corda)")
-                else:
-                    nome_item = partes[1].strip()
-                    print(fabricar_item(nome_item, local="mao"))
-
-            elif entrada.startswith("/buscar"):
-                limpar()
-                print(texto_fase, end="")
-                partes = entrada.split(" ", 1)
-                if len(partes) < 2:
-                    print("Use assim: /buscar tipo (ex: /buscar alimento)")
-                else:
-                    tipo = partes[1].strip()
-                    encontrados = pesquisar_item_por_tipo(tipo)
-                    if encontrados:
-                        for nome_item, quantidade in encontrados.items():
-                            item = itens_jogo(nome_item)
-                            print(f"{item['nome_item']} x{quantidade} - {item['valor_item']} ouro - {item['peso_item']} peso")
-                    else:
-                        print(f"Nenhum item do tipo '{tipo}' no inventário.")
-
-            elif entrada.startswith("/ordenar"):
-                limpar()
-                print(texto_fase, end="")
-                partes = entrada.split(" ", 1)
-                criterio = partes[1].strip() if len(partes) > 1 else "tipo_item"
-                ordenar_inventario_por(criterio)
-                print(f"Inventário ordenado por {criterio}.")
+                exibir_rodape_fase()
 
             else:
                 limpar()
                 print(texto_fase, end="")
                 print(f"{Cores.VERMELHO}Comando inválido! Digite /help para ver a lista de comandos.{Cores.RESET}")
+                exibir_rodape_fase()
 
         if sair_do_jogo:
             fim_sessao = time.time()
