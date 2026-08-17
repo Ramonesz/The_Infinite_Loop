@@ -170,7 +170,7 @@ fase=1
 
 # O inventário agora é um dicionário {chave_do_item: quantidade}, e não mais um set,
 # porque precisamos guardar quantidade de cada item (e buscar os dados dele em itens_jogo())
-inventario = {"espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2}
+inventario = {"espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2, "capacete_de_couro": 1, "armadura_de_couro": 1}
 items_no_inv = sum(inventario.values())
 
 ouro=0
@@ -188,7 +188,11 @@ ATAQUE_BASE_DESARMADO = 10 # dano base "de mão" (sem arma nenhuma), igual ao va
 ataque_jogador = 10 # dano de ataque final (recalculado por recalcular_ataque() sempre que muda a arma/afiação)
 bonus_afiar = 0 # bônus permanente ganho ao afiar a arma na pedra de amolar
 arma_equipada = None # chave interna da arma equipada, ou None se estiver desarmado
-armadura_equipada = None # chave interna da armadura equipada, ou None se estiver sem armadura
+
+# Slots de armadura: cada um guarda a chave do item equipado ali, ou None.
+SLOTS_ARMADURA = ("capacete", "peitoral", "pernas", "botas", "escudo")
+equipamento_armadura = {slot: None for slot in SLOTS_ARMADURA}
+
 peso_maximo_jogador = 30 # capacidade de peso, definida de verdade em iniciar_jogo() de acordo com a raça
 
 
@@ -196,13 +200,32 @@ def recalcular_ataque():
     """Recalcula o ataque_jogador a partir do dano base desarmado + bônus de
     afiar + bônus da arma equipada (a arma SOMA ao dano base, nunca substitui
     ele - assim equipar uma arma nunca deixa o jogador mais fraco do que
-    lutar desarmado)."""
-    global ataque_jogador
+    lutar desarmado). Se a arma equipada não estiver mais no inventário
+    (descartada/consumida), ela é automaticamente desequipada."""
+    global ataque_jogador, arma_equipada
+    if arma_equipada is not None and inventario.get(arma_equipada, 0) <= 0:
+        arma_equipada = None
+
     bonus_arma = 0
     if arma_equipada is not None:
         bonus_arma = itens_jogo(arma_equipada).get("dano_item", 0)
     ataque_jogador = ATAQUE_BASE_DESARMADO + bonus_afiar + bonus_arma
     return ataque_jogador
+
+
+def recalcular_armadura():
+    """Soma a defesa de TODAS as peças de armadura equipadas (capacete +
+    peitoral + pernas + botas + escudo). Se algum item equipado não estiver
+    mais no inventário, o slot é automaticamente esvaziado."""
+    total = 0
+    for slot, chave in equipamento_armadura.items():
+        if chave is not None and inventario.get(chave, 0) <= 0:
+            equipamento_armadura[slot] = None
+            chave = None
+        if chave is not None:
+            total += itens_jogo(chave).get("defesa_item", 0)
+    return total
+
 
 # Listas dos itens que cada vendedor tem disponível para venda
 ITENS_OTTO = ["carne_assada", "carne_crua", "maca_crocante", "bagas_vermelhas", "armadura_de_couro", "pocao_de_cura_pequena", "arco_de_caca"]
@@ -254,22 +277,46 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
         }
 
     # ---------------- ARMADURAS ----------------
+    # Cada peça de armadura ocupa um "slot_item" (capacete, peitoral, pernas,
+    # botas, escudo). A defesa total do jogador é a SOMA da defesa de tudo que
+    # estiver equipado nesses slots (ver recalcular_armadura()).
     elif nome_item == "tunica_de_pano":
         item = {
-            "nome_item": "Túnica de Pano", "tipo_item": "armadura",
+            "nome_item": "Túnica de Pano", "tipo_item": "armadura", "slot_item": "peitoral",
             "valor_item": 10, "peso_item": 2, "defesa_item": 2,
             "craftavel_item": False
         }
     elif nome_item == "armadura_de_couro":
         item = {
-            "nome_item": "Armadura de Couro", "tipo_item": "armadura",
+            "nome_item": "Peitoral de Couro", "tipo_item": "armadura", "slot_item": "peitoral",
             "valor_item": 25, "peso_item": 6, "defesa_item": 8,
             "craftavel_item": True, "local_fabricacao_item": "mao",
             "receita_item": {"pele_de_lobo": 2, "teia_de_aranha": 1}
         }
+    elif nome_item == "capacete_de_couro":
+        item = {
+            "nome_item": "Capacete de Couro", "tipo_item": "armadura", "slot_item": "capacete",
+            "valor_item": 15, "peso_item": 1.5, "defesa_item": 4,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"pele_de_lobo": 1, "teia_de_aranha": 1}
+        }
+    elif nome_item == "calca_de_couro":
+        item = {
+            "nome_item": "Calça de Couro", "tipo_item": "armadura", "slot_item": "pernas",
+            "valor_item": 18, "peso_item": 3, "defesa_item": 5,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"pele_de_lobo": 2}
+        }
+    elif nome_item == "botas_de_couro":
+        item = {
+            "nome_item": "Botas de Couro", "tipo_item": "armadura", "slot_item": "botas",
+            "valor_item": 12, "peso_item": 1.5, "defesa_item": 3,
+            "craftavel_item": True, "local_fabricacao_item": "mao",
+            "receita_item": {"pele_de_lobo": 1}
+        }
     elif nome_item == "escudo_de_madeira":
         item = {
-            "nome_item": "Escudo de Madeira", "tipo_item": "armadura",
+            "nome_item": "Escudo de Madeira", "tipo_item": "armadura", "slot_item": "escudo",
             "valor_item": 30, "peso_item": 4, "defesa_item": 4,
             "craftavel_item": True, "local_fabricacao_item": "mao",
             "receita_item": {"madeira_simples": 3}
@@ -428,9 +475,12 @@ DESCRICOES_ITENS = {
     "adaga_cega": "Uma adaga velha e sem fio. Rápida, mas causa pouco dano.",
     "espada_de_ferro": "Espada forjada em ferro. Precisa ser fabricada na forja de Gol.",
     "arco_de_caca": "Arco de caça leve, feito com madeira de carvalho e teia de aranha.",
-    "tunica_de_pano": "Uma túnica simples de pano, oferece pouca proteção.",
-    "armadura_de_couro": "Armadura feita de pele de lobo e teia de aranha, resistente e leve.",
-    "escudo_de_madeira": "Escudo simples de madeira, ajuda a bloquear golpes.",
+    "tunica_de_pano": "Uma túnica simples de pano, oferece pouca proteção. Ocupa o slot de peitoral.",
+    "armadura_de_couro": "Peitoral feito de pele de lobo e teia de aranha, resistente e leve. Ocupa o slot de peitoral.",
+    "capacete_de_couro": "Capacete simples de couro. Ocupa o slot de capacete.",
+    "calca_de_couro": "Calça reforçada de couro. Ocupa o slot de pernas.",
+    "botas_de_couro": "Botas leves de couro. Ocupa o slot de botas.",
+    "escudo_de_madeira": "Escudo simples de madeira, ajuda a bloquear golpes. Ocupa o slot de escudo.",
     "pocao_de_cura_pequena": "Poção que restaura uma pequena quantidade de vida ao ser consumida.",
     "pocao_de_cura_grande": "Poção que restaura uma grande quantidade de vida ao ser consumida.",
     "pocao_de_mana_pequena": "Poção que restaura uma pequena quantidade de mana ao ser consumida.",
@@ -535,37 +585,66 @@ def resolver_id_item(id_digitado):
     return None
 
 
+def item_esta_equipado(nome_item):
+    """Checa se um item (arma ou peça de armadura) está equipado agora."""
+    if nome_item == arma_equipada:
+        return True
+    return nome_item in equipamento_armadura.values()
+
+
 def equipar_item(nome_item, armadura_atual):
-    """Equipa uma arma (soma o dano dela ao ataque base) ou uma armadura
-    (define a defesa vinda da armadura). Retorna (armadura_atualizada, mensagem).
-    Guarda em arma_equipada/armadura_equipada qual item está em uso, pra poder
-    ser mostrado no inventário e permitir desequipar depois."""
-    global arma_equipada, armadura_equipada
+    """Equipa uma arma (soma o dano dela ao ataque base) ou uma peça de
+    armadura (ocupa o slot dela e soma a defesa). Se o item escolhido JÁ
+    estiver equipado, essa mesma ação o DESEQUIPA (efeito de alternar/toggle).
+    Retorna (armadura_atualizada, mensagem)."""
+    global arma_equipada
     item = itens_jogo(nome_item)
 
     if item["tipo_item"] == "arma":
+        if arma_equipada == nome_item:
+            arma_equipada = None
+            novo_ataque = recalcular_ataque()
+            return armadura_atual, f"{Cores.AMARELO} Você guardou {item['nome_item']}. Ataque agora é {novo_ataque} (desarmado).{Cores.RESET}"
+
         ataque_antes = ataque_jogador
         arma_equipada = nome_item
         novo_ataque = recalcular_ataque()
         diferenca = novo_ataque - ataque_antes
         tag_diferenca = f"(+{diferenca})" if diferenca >= 0 else f"({diferenca})"
         return armadura_atual, f"{Cores.VERDE} Você equipou {item['nome_item']}! Ataque total agora é {novo_ataque} {tag_diferenca}.{Cores.RESET}"
+
     elif item["tipo_item"] == "armadura":
-        armadura_equipada = nome_item
-        nova_armadura = item["defesa_item"]
-        return nova_armadura, f"{Cores.VERDE} Você equipou {item['nome_item']}! Sua armadura agora dá {nova_armadura} de defesa.{Cores.RESET}"
+        slot = item.get("slot_item", "peitoral")
+
+        if equipamento_armadura.get(slot) == nome_item:
+            equipamento_armadura[slot] = None
+            nova_armadura = recalcular_armadura()
+            return nova_armadura, f"{Cores.AMARELO} Você guardou {item['nome_item']} (slot: {slot}). Defesa de armadura agora é {nova_armadura}.{Cores.RESET}"
+
+        item_anterior = equipamento_armadura.get(slot)
+        armadura_antes = armadura_atual
+        equipamento_armadura[slot] = nome_item
+        nova_armadura = recalcular_armadura()
+        diferenca = nova_armadura - armadura_antes
+        tag_diferenca = f"(+{diferenca})" if diferenca >= 0 else f"({diferenca})"
+        aviso_troca = ""
+        if item_anterior:
+            aviso_troca = f" (substituiu {itens_jogo(item_anterior)['nome_item']})"
+        return nova_armadura, f"{Cores.VERDE} Você equipou {item['nome_item']} no slot '{slot}'{aviso_troca}! Defesa de armadura total agora é {nova_armadura} {tag_diferenca}.{Cores.RESET}"
+
     else:
         return armadura_atual, f"{Cores.VERMELHO} {item['nome_item']} não pode ser equipado.{Cores.RESET}"
 
 
 def desequipar_tudo(armadura_atual):
-    """Guarda a arma e a armadura equipadas (volta pro ataque desarmado + bônus
-    de afiar, e defesa de armadura 0)."""
-    global arma_equipada, armadura_equipada
+    """Guarda a arma e todas as peças de armadura equipadas (volta pro ataque
+    desarmado + bônus de afiar, e defesa de armadura 0)."""
+    global arma_equipada
     arma_equipada = None
-    armadura_equipada = None
+    for slot in equipamento_armadura:
+        equipamento_armadura[slot] = None
     novo_ataque = recalcular_ataque()
-    return 0, f"{Cores.AMARELO} Você guardou sua arma e armadura. Ataque agora é {novo_ataque} (desarmado), armadura 0.{Cores.RESET}"
+    return 0, f"{Cores.AMARELO} Você guardou sua arma e toda a armadura. Ataque agora é {novo_ataque} (desarmado), armadura 0.{Cores.RESET}"
 
 
 def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome, velocidade=None, status=None):
@@ -661,6 +740,17 @@ def fabricar_item(nome_item, local="mao"):
     return f"{Cores.VERDE} Você fabricou: {item['nome_item']}!{Cores.RESET}"
 
 
+def _texto_equipamento_armadura():
+    """Monta o texto 'slot: nome' de cada peça de armadura equipada, ou
+    'Nenhuma' se não houver nada equipado em nenhum slot."""
+    partes = []
+    for slot in SLOTS_ARMADURA:
+        chave = equipamento_armadura.get(slot)
+        if chave:
+            partes.append(f"{slot.capitalize()}: {itens_jogo(chave)['nome_item']}")
+    return " | ".join(partes) if partes else "Nenhuma"
+
+
 def _imprimir_tabela_inventario(ouro):
     """Desenha a tabela do inventário no estilo novo (cabeçalho, linha de ouro/peso,
     colunas com ID, nome, categoria, quantidade e peso). Usada tanto pelo modo
@@ -671,14 +761,16 @@ def _imprimir_tabela_inventario(ouro):
     tag_sobrecarga = f" {Cores.VERMELHO}[SOBRECARREGADO]{Cores.RESET}" if sobrecarregado else ""
 
     nome_arma = itens_jogo(arma_equipada)["nome_item"] if arma_equipada else "Nenhuma (desarmado)"
-    nome_armadura = itens_jogo(armadura_equipada)["nome_item"] if armadura_equipada else "Nenhuma"
+    texto_armadura = _texto_equipamento_armadura()
+    defesa_armadura_total = recalcular_armadura()
 
     largura = 80
     print("=" * largura)
     print("INVENTÁRIO DO JOGADOR".center(largura))
     print("=" * largura)
     print(f" OURO: {Cores.AMARELO}{ouro}g{Cores.RESET} | PESO: {cor_peso}{peso_atual} / {peso_maximo_jogador} kg{Cores.RESET}{tag_sobrecarga} | ITENS: {calcular_total_itens_inventario()}")
-    print(f" {Cores.CIANO}EQUIPADO{Cores.RESET} -> Arma: {nome_arma} (ataque {ataque_jogador}) | Armadura: {nome_armadura}")
+    print(f" {Cores.CIANO}ARMA EQUIPADA{Cores.RESET} -> {nome_arma} (ataque total: {ataque_jogador})")
+    print(f" {Cores.CIANO}ARMADURA EQUIPADA{Cores.RESET} -> {texto_armadura} (defesa total: {defesa_armadura_total})")
     print("-" * largura)
     print(f" {'ID':<4}| {'NOME DO ITEM':<26}| {'CAT.':<12}| {'QTD':<5}| PESO")
     print("-" * largura)
@@ -689,9 +781,7 @@ def _imprimir_tabela_inventario(ouro):
         for indice, (nome_item, quantidade) in enumerate(inventario.items(), start=1):
             item = itens_jogo(nome_item)
             categoria = obter_categoria_exibicao(item)
-            tag_equipado = ""
-            if nome_item == arma_equipada or nome_item == armadura_equipada:
-                tag_equipado = f" {Cores.VERDE}(Equipado){Cores.RESET}"
+            tag_equipado = f" {Cores.VERDE}(Equipado){Cores.RESET}" if item_esta_equipado(nome_item) else ""
             print(f"[{indice:02d}]| {item['nome_item']:<26}| {categoria:<12}| {quantidade:<5}| {item['peso_item']} kg{tag_equipado}")
     print("=" * largura)
 
@@ -737,12 +827,16 @@ def _exibir_detalhes_item(chave):
     categoria = obter_categoria_exibicao(item)
     descricao = obter_descricao_item(chave, item)
     efeitos = construir_lista_efeitos(item)
+    equipado = item_esta_equipado(chave)
 
     largura = 80
     print("=" * largura)
     print("DETALHES DO ITEM".center(largura))
     print("-" * largura)
-    print(f" Item Selecionado: {item['nome_item']} (x{quantidade}) [{categoria}]")
+    tag_equipado = f" {Cores.VERDE}[EQUIPADO]{Cores.RESET}" if equipado else ""
+    print(f" Item Selecionado: {item['nome_item']} (x{quantidade}) [{categoria}]{tag_equipado}")
+    if "slot_item" in item:
+        print(f" Slot de equipamento: {item['slot_item']}")
     print(f" Descrição: {descricao}")
     print(f" Efeitos: {', '.join(efeitos)}")
     print(f" Valor: {item['valor_item']} ouro | Peso unitário: {item['peso_item']} kg")
@@ -802,6 +896,14 @@ def exibir_menu_fabricacao_mao():
     return itens_mao
 
 
+def aguardar_continuar():
+    """Pausa a execução até o jogador apertar ENTER. Necessário porque a tela
+    do inventário limpa a cada repetição do menu - sem essa pausa, mensagens
+    e telas informativas (como os detalhes de um item) seriam apagadas antes
+    do jogador conseguir ler."""
+    input(f"\n{Cores.CIANO}[Pressione ENTER para continuar]{Cores.RESET}")
+
+
 def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, armadura, ouro):
     """
     Hub completo do inventário, no novo layout com ID por item (01, 02...) e
@@ -820,7 +922,7 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
 --------------------------------------------------------------------------------
  [1] Usar / Consumir      [4] Ordenar / Filtrar    [7] Buscar Item
  [2] Fabricar (Crafting)  [5] Ver Detalhes         [8] Sair do Menu
- [3] Descartar Item       [6] Equipar (arma/armadura)
+ [3] Descartar Item       [6] Equipar / Desequipar
 ================================================================================""")
         escolha = input(" Digite a opção desejada ou ID do item: ").strip().lower()
 
@@ -829,6 +931,9 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
             chave = resolver_id_item(escolha)
             if chave:
                 _exibir_detalhes_item(chave)
+            else:
+                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
+            aguardar_continuar()
             continue
 
         if escolha in ("8", "sair"):
@@ -837,6 +942,7 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
         elif escolha in ("1", "usar", "consumir"):
             if not inventario:
                 print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                aguardar_continuar()
                 continue
             print("\n--------- ITENS QUE PODEM SER USADOS/CONSUMIDOS ---------")
             algum_consumivel = False
@@ -859,10 +965,12 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                     chave, vida, vida_maxima, mana, mana_maxima, fome, velocidade, {}
                 )
                 print(mensagem)
+            aguardar_continuar()
 
         elif escolha in ("2", "fabricar"):
             itens_mao = exibir_menu_fabricacao_mao()
             if not itens_mao:
+                aguardar_continuar()
                 continue
             id_digitado = input(" Digite o número do item para fabricar na mão (ou 'cancelar'): ").strip().lower()
             if id_digitado == "cancelar":
@@ -874,10 +982,12 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                 print(f"{Cores.VERMELHO} Número inválido.{Cores.RESET}")
             else:
                 print(fabricar_item(chave_escolhida, local="mao"))
+            aguardar_continuar()
 
         elif escolha in ("3", "descartar"):
             if not inventario:
                 print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                aguardar_continuar()
                 continue
             id_digitado = input(" Digite o ID do item que deseja descartar: ").strip()
             chave = resolver_id_item(id_digitado)
@@ -888,16 +998,22 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                 inventario[chave] -= 1
                 if inventario[chave] <= 0:
                     del inventario[chave]
+                # se o item descartado estava equipado, ele é automaticamente desequipado
+                recalcular_ataque()
+                armadura = recalcular_armadura()
                 print(f"{Cores.AMARELO} Você descartou 1x {item['nome_item']}.{Cores.RESET}")
+            aguardar_continuar()
 
         elif escolha in ("4", "ordenar", "filtrar"):
             criterio = input(" Ordenar por (tipo_item / valor_item / peso_item): ").strip() or "tipo_item"
             ordenar_inventario_por(criterio)
             print(f"Inventário ordenado por {criterio}.")
+            aguardar_continuar()
 
         elif escolha in ("5", "detalhes"):
             if not inventario:
                 print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                aguardar_continuar()
                 continue
             id_digitado = input(" Digite o ID do item para ver os detalhes: ").strip()
             chave = resolver_id_item(id_digitado)
@@ -905,18 +1021,28 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                 print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
             else:
                 _exibir_detalhes_item(chave)
+            aguardar_continuar()
 
-        elif escolha in ("6", "equipar"):
+        elif escolha in ("6", "equipar", "desequipar"):
             if not inventario:
                 print(f"{Cores.VERMELHO} Inventário vazio.{Cores.RESET}")
+                aguardar_continuar()
                 continue
-            id_digitado = input(" Digite o ID da arma ou armadura que deseja equipar: ").strip()
-            chave = resolver_id_item(id_digitado)
-            if chave is None:
-                print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
-            else:
-                armadura, mensagem = equipar_item(chave, armadura)
+            id_digitado = input(
+                " Digite o ID da arma/armadura para equipar ou desequipar (item já"
+                " equipado alterna), ou 'guardar' para tirar tudo: "
+            ).strip().lower()
+            if id_digitado == "guardar":
+                armadura, mensagem = desequipar_tudo(armadura)
                 print(mensagem)
+            else:
+                chave = resolver_id_item(id_digitado)
+                if chave is None:
+                    print(f"{Cores.VERMELHO} ID inválido.{Cores.RESET}")
+                else:
+                    armadura, mensagem = equipar_item(chave, armadura)
+                    print(mensagem)
+            aguardar_continuar()
 
         elif escolha in ("7", "buscar"):
             tipo = input(" Buscar por tipo (ex: alimento, arma, consumivel, recurso): ").strip()
@@ -927,9 +1053,11 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                     print(f" {item['nome_item']} x{quantidade} - {item['valor_item']} ouro - {item['peso_item']} kg")
             else:
                 print(f"Nenhum item do tipo '{tipo}' no inventário.")
+            aguardar_continuar()
 
         else:
             print(f'{Cores.VERMELHO}Opção inválida. Digite um número de 1 a 8, ou o ID de um item.{Cores.RESET}')
+            aguardar_continuar()
 
     return vida, mana, fome, velocidade, armadura
 
@@ -989,11 +1117,11 @@ def definir_atributos(raca):
 # raça: quem tem mais defesa/vida (corpo mais robusto) aguenta mais peso,
 # quem tem mais velocidade (corpo mais leve/ágil) aguenta menos.
 PESO_MAXIMO_RACA = {
-    "Humano": 30,
-    "Elfo": 24,
-    "Anao": 42,
-    "Goblin": 20,
-    "Draconato": 36,
+    "Humano": 40,
+    "Elfo": 34,
+    "Anao": 52,
+    "Goblin": 30,
+    "Draconato": 46,
 }
 
 # Percentual de penalidade quando o jogador está acima do peso máximo:
@@ -2263,6 +2391,7 @@ def loja(nome_vendedor, itens_venda, ouro):
         print("""
 comprar <numero>    : compra um item da loja
 vender               : abre a lista dos seus itens para vender
+ouro                 : ver a quantidade de ouro disponível
 sair                 : sai da loja
 """)
         escolha = input("-> ").strip().lower()
@@ -2291,6 +2420,9 @@ sair                 : sai da loja
 
         elif escolha == "vender":
             ouro = vender_interativo(ouro)
+
+        elif escolha == "ouro":
+            print(f"Você possui: {ouro} ouros")
 
         else:
             print('Comando inválido. Use "comprar <numero>", "vender" ou "sair".')
@@ -2324,8 +2456,10 @@ def forja_interativa():
             chave_escolhida = itens_forja[indice - 1][0]
         except (ValueError, IndexError):
             print(f"{Cores.VERMELHO} Número inválido.{Cores.RESET}")
+            aguardar_continuar()
             continue
         print(fabricar_item(chave_escolhida, local="forja"))
+        aguardar_continuar()
 
 
 def resolver_baus_gollum(ouro, vida):
@@ -2772,7 +2906,7 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
 
 
 def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, items_no_inv, fase, fome, ouro, peso, xp, nivel, armadura):
-    global peso_maximo_jogador, arma_equipada, armadura_equipada
+    global peso_maximo_jogador, arma_equipada
     limpar()
     inicio_sessao = time.time()
 
@@ -2783,10 +2917,17 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
     # peso máximo que o jogador consegue carregar, de acordo com a raça escolhida
     peso_maximo_jogador = definir_peso_maximo(raca_personagem)
 
-    # o jogador já começa com a Espada de Madeira equipada, já que ela vem no inventário inicial
+    # o jogador já começa com a Espada de Madeira, o Capacete de Couro e o
+    # Peitoral de Couro equipados, já que eles vêm no inventário inicial
     arma_equipada = "espada_de_madeira" if "espada_de_madeira" in inventario else None
-    armadura_equipada = None
+    for slot in equipamento_armadura:
+        equipamento_armadura[slot] = None
+    if "capacete_de_couro" in inventario:
+        equipamento_armadura["capacete"] = "capacete_de_couro"
+    if "armadura_de_couro" in inventario:
+        equipamento_armadura["peitoral"] = "armadura_de_couro"
     recalcular_ataque()
+    armadura = recalcular_armadura()
 
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
     while True:
