@@ -18,13 +18,19 @@ class Cores:
 
 
 if platform.system() == "Windows":
-    os.system("")  # habilita as cores ANSI no cmd/PowerShell do Windows 10+
+    os.system("")
 
 
 def limpar():
     os.system("clear" if os.name != "nt" else "cls")
 
-def menu(): # Mostra o menu
+
+def escrever_com_efeito(texto, atraso=0.012):
+    for caractere in texto:
+        print(caractere, end="", flush=True)
+        time.sleep(atraso)
+
+def menu():
     print("""------------------------------
          THE INFINITE LOOP 
               v.1.0
@@ -32,9 +38,9 @@ def menu(): # Mostra o menu
     ou "/help" para ver os comandos
 ------------------------------""")
 
-def obter_nickname(): # Pega o nick do usuário
+def obter_nickname():
     while True:
-        nick = input("Insira seu nome de usuário: ").strip() # .strip serve para tirar espaços em branco e descontar o caractere dele, exemplo "    ola  " fica "ola"
+        nick = input("Insira seu nome de usuário: ").strip()
         tamanho = len(nick)
         
         if tamanho == 0:
@@ -54,10 +60,10 @@ Esperamos que se divirta jogando o nosso text-based RPG!
 
             return nick 
         
-def trocar_nickname(antigo_nick): # Troca o nick do usuário com o comando /renick
+def trocar_nickname(antigo_nick):
     while True:
          
-        novo_nick = input("Insira seu novo nome de usuário: ").strip() # .strip serve para tirar espaços em branco e descontar o caractere dele, exemplo "    ola  " fica "ola"
+        novo_nick = input("Insira seu novo nome de usuário: ").strip()
         tamanho = len(novo_nick)
         
         if tamanho == 0:
@@ -69,7 +75,7 @@ def trocar_nickname(antigo_nick): # Troca o nick do usuário com o comando /reni
             print(f"Nick novo: {novo_nick}")
             return novo_nick
         
-def exibir_help(): # Exibe o comando /help
+def exibir_help():
     print("""
 ------------ COMANDOS GLOBAIS ----------------
 /start  : Inicia a criação de personagem e o jogo;
@@ -99,14 +105,9 @@ def exibir_help(): # Exibe o comando /help
 /sts : Espia seus status sem gastar o turno;
 (nenhum outro comando pode ser usado durante o combate)
 
------------ VENDEDORES E FORJA ----------------
-Alguns personagens (Otto, Gol, Vivian, Othon) permitem conversar e abrir uma loja,
-onde é possível comprar itens (gastando ouro) ou vender itens do seu inventário.
-Na forja de Gol também é possível fabricar itens de forja (ex: espada_de_ferro).
-
 """)
 
-def exibir_devs(): # Exibe os devs e a gamedev
+def exibir_devs():
     print("""
 THE INFINITE LOOP é um jogo de RPG feito exclusivamente com Python. Ele veio de uma ideia de trabalho proposta
 pelo professor Alison Borges, do Instituto Federal Catarinense — Campus Concórdia. O jogo foi produzido pelos
@@ -115,8 +116,6 @@ ca para Internet. O jogo foi inspirado em RPGs de texto (Text-based RPG), especi
 """)
      
 
-# Descrição curta do buff passivo permanente de cada raça, usada tanto na
-# tela de escolha de raça quanto no /tabraca.
 BUFFS_RACA = {
     "Humano": "Nenhum bônus especial",
     "Elfo": "Mais dano com Armas de Mana",
@@ -173,65 +172,42 @@ def obter_raca():
              print("\nRaca nao identificada, digite o numero (1 a 5) ou o nome da raca, veja a tabela a cima.\n")
 
         
-# Atributos globais ↓
-
-xp = 0 # Dá para fazer um sistema em que a cada 100 de xp ele reseta e ganha um nível, ganhando mais atributos
+xp = 0
 nivel = 0
 fase=1
 
-# O inventário agora é um dicionário {chave_do_item: quantidade}, e não mais um set,
-# porque precisamos guardar quantidade de cada item (e buscar os dados dele em itens_jogo())
 inventario = {"espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2, "capacete_de_couro": 1, "armadura_de_couro": 1}
 items_no_inv = sum(inventario.values())
 
 ouro=0
 fome = 100
-armadura = 0 # A armadura aqui vem do que ele está vestindo
-peso = 0 # Agora o peso é calculado a partir do inventário, com calcular_peso_inventario()
-# Atributos que mudam dependendo da raça ↓ 
+armadura = 0
+peso = 0
 
-vida = 0 # 100 é a vida base, dependendo da raça pode aumentar ou diminuir
+vida = 0
 velocidade = 0
 defesa = 0 
 mana = 0       
 
-ATAQUE_BASE_DESARMADO = 10 # dano base "de mão" (sem arma nenhuma), igual ao valor original do jogo
-ataque_jogador = 10 # dano de ataque final (recalculado por recalcular_ataque() sempre que muda a arma/afiação)
-bonus_afiar = 0 # bônus permanente ganho ao afiar a arma na pedra de amolar
-arma_equipada = None # chave interna da arma equipada, ou None se estiver desarmado
+ATAQUE_BASE_DESARMADO = 10
+ataque_jogador = 10
+bonus_afiar = 0
+arma_equipada = None
 
-# Bônus permanentes de defesa/velocidade concedidos por eventos da história
-# (ex: orar no altar da fase 23 dá +5 de Defesa; o Pacto da fase 35 dá +10 de
-# Velocidade). Ficam separados da defesa/velocidade "base" do jogador para não
-# precisar mudar a assinatura de todas as funções que já usam esses valores.
 bonus_defesa_eventos = 0
 bonus_velocidade_eventos = 0
 
-# Controla se o jogador fez o Pacto da fase 35: enquanto True, ele regenera
-# vida a cada fase (2 se for Draconato, 1 para as outras raças) além da
-# regeneração racial normal do Draconato.
 pacto_feito = False
 
-# Slots de armadura: cada um guarda a chave do item equipado ali, ou None.
-# "anel" é um slot de acessório (ex: Anel de Cura), que também soma defesa e
-# pode conceder bônus de vida/mana máximos enquanto estiver equipado.
 SLOTS_ARMADURA = ("capacete", "peitoral", "pernas", "botas", "escudo", "anel")
 equipamento_armadura = {slot: None for slot in SLOTS_ARMADURA}
 
-peso_maximo_jogador = 30 # capacidade de peso, definida de verdade em iniciar_jogo() de acordo com a raça
+peso_maximo_jogador = 30
 
-# Status de longa duração do jogador, aplicados FORA de combate (ex: veneno de
-# uma armadilha), consumidos gradualmente conforme as fases avançam - em vez
-# de aplicar todo o dano de uma vez só.
 status_efeitos_jogador = {}
 
 
 def recalcular_ataque():
-    """Recalcula o ataque_jogador a partir do dano base desarmado + bônus de
-    afiar + bônus da arma equipada (a arma SOMA ao dano base, nunca substitui
-    ele - assim equipar uma arma nunca deixa o jogador mais fraco do que
-    lutar desarmado). Se a arma equipada não estiver mais no inventário
-    (descartada/consumida/vendida), ela é automaticamente desequipada."""
     global ataque_jogador, arma_equipada
     if arma_equipada is not None and inventario.get(arma_equipada, 0) <= 0:
         arma_equipada = None
@@ -244,10 +220,6 @@ def recalcular_ataque():
 
 
 def recalcular_armadura():
-    """Soma a defesa de TODAS as peças equipadas (capacete + peitoral + pernas
-    + botas + escudo + anel). Se algum item equipado não estiver mais no
-    inventário (descartado/consumido/vendido), o slot é automaticamente
-    esvaziado - corrige o bug de um item vendido continuar 'equipado'."""
     total = 0
     for slot, chave in equipamento_armadura.items():
         if chave is not None and inventario.get(chave, 0) <= 0:
@@ -259,27 +231,17 @@ def recalcular_armadura():
 
 
 def sincronizar_equipamentos():
-    """Verifica arma e todos os slots de armadura/acessório, desequipando
-    automaticamente qualquer item que não esteja mais no inventário (ex: foi
-    vendido ou descartado). Deve ser chamada sempre depois de qualquer
-    operação que remova itens do inventário fora do fluxo normal de
-    descarte/uso (como vender). Retorna a nova defesa total (armadura)."""
     recalcular_ataque()
     return recalcular_armadura()
 
 
-# Listas dos itens que cada vendedor tem disponível para venda
 ITENS_OTTO = ["carne_assada", "carne_crua", "maca_crocante", "bagas_vermelhas", "armadura_de_couro", "pocao_de_cura_pequena", "arco_de_caca"]
 ITENS_GOL = ["espada_de_ferro", "minerio_de_ferro", "carvao", "armadura_de_couro", "escudo_de_madeira"]
 ITENS_VIVIAN = ["pocao_de_mana_pequena", "pocao_de_cura_grande", "tunica_de_pano", "antidoto", "cajado_arcano"]
 ITENS_OTHON = ["pocao_de_cura_pequena", "pocao_de_cura_grande", "pocao_de_mana_pequena", "adaga_cega", "armadura_de_couro", "anel_de_cura", "adaga_encantada"]
 
 
-def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para os itens do jogo
-    # cada item tem: nome_item, tipo_item, valor_item (ouro), peso_item
-    # e dependendo do tipo_item, alguns campos a mais (dano_item, cura_vida_item, fome_item...)
-    # craftavel_item e receita_item só existem se o item puder ser fabricado
-
+def itens_jogo(nome_item):
     item = {
         "nome_item": "Nenhum",
         "tipo_item": "nenhum",
@@ -288,7 +250,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
         "craftavel_item": False
     }
 
-    # ---------------- ARMAS ----------------
     if nome_item == "espada_de_madeira":
         item = {
             "nome_item": "Espada de Madeira", "tipo_item": "arma",
@@ -317,27 +278,18 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "receita_item": {"madeira_de_carvalho": 2, "teia_de_aranha": 1}
         }
     elif nome_item == "cajado_arcano":
-        # Arma de Mana: causa bem mais dano que uma arma comum, mas consome
-        # mana a cada ataque (ver "custo_mana_item", usado em batalha()).
-        # Se não houver mana suficiente, o ataque usa só o dano base do
-        # jogador (sem o bônus mágico do cajado).
         item = {
             "nome_item": "Cajado Arcano", "tipo_item": "arma",
             "valor_item": 180, "peso_item": 2, "dano_item": 26, "custo_mana_item": 15,
             "craftavel_item": False
         }
     elif nome_item == "adaga_encantada":
-        # Arma de Mana mais leve, dano menor mas custo de mana também menor.
         item = {
             "nome_item": "Adaga Encantada", "tipo_item": "arma",
             "valor_item": 90, "peso_item": 1, "dano_item": 16, "custo_mana_item": 8,
             "craftavel_item": False
         }
 
-    # ---------------- ARMADURAS ----------------
-    # Cada peça de armadura/acessório ocupa um "slot_item" (capacete, peitoral,
-    # pernas, botas, escudo, anel). A defesa total do jogador é a SOMA da
-    # defesa de tudo que estiver equipado nesses slots (ver recalcular_armadura()).
     elif nome_item == "tunica_de_pano":
         item = {
             "nome_item": "Túnica de Pano", "tipo_item": "armadura", "slot_item": "peitoral",
@@ -380,9 +332,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "receita_item": {"madeira_simples": 3}
         }
     elif nome_item == "anel_de_cura":
-        # Acessório equipável (slot "anel"): enquanto equipado, aumenta a
-        # defesa e a vida máxima do jogador. Ao desequipar, os bônus somem
-        # (ver equipar_item / desequipar_tudo, que ajustam vida_maxima na hora).
         item = {
             "nome_item": "Anel de Cura", "tipo_item": "armadura", "slot_item": "anel",
             "valor_item": 80, "peso_item": 0.2, "defesa_item": 3,
@@ -390,7 +339,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "craftavel_item": False
         }
 
-    # ---------------- CONSUMÍVEIS ----------------
     elif nome_item == "pocao_de_cura_pequena":
         item = {
             "nome_item": "Poção de Cura Pequena", "tipo_item": "consumivel",
@@ -417,7 +365,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "receita_item": {"folha_venenosa": 1, "asa_de_morcego": 1}
         }
 
-    # ---------------- ALIMENTOS ----------------
     elif nome_item == "bagas_vermelhas":
         item = {
             "nome_item": "Bagas Vermelhas Silvestres", "tipo_item": "alimento",
@@ -450,7 +397,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "receita_item": {"carne_crua": 1, "madeira_simples": 1}
         }
 
-    # ---------------- RECURSOS ----------------
     elif nome_item == "madeira_simples":
         item = {
             "nome_item": "Madeira Simples", "tipo_item": "recurso",
@@ -471,7 +417,7 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "nome_item": "Minério de Ferro", "tipo_item": "recurso",
             "valor_item": 20, "peso_item": 2, "craftavel_item": False
         }
-    elif nome_item == "corda": # item simples, craftavel na mao (pedido de exemplo)
+    elif nome_item == "corda":
         item = {
             "nome_item": "Corda", "tipo_item": "recurso",
             "valor_item": 6, "peso_item": 0.5,
@@ -479,7 +425,6 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "receita_item": {"teia_de_aranha": 2}
         }
 
-    # ---------------- DROPS DE MONSTRO ----------------
     elif nome_item == "gelatina_verde":
         item = {
             "nome_item": "Gelatina Verde", "tipo_item": "drop",
@@ -506,26 +451,22 @@ def itens_jogo(nome_item): # Funciona igual a função monstros(), só que para 
             "valor_item": 15, "peso_item": 0.2, "craftavel_item": False
         }
 
-    # ---------------- INUSITADOS ----------------
     elif nome_item == "pedra_batata":
         item = {
             "nome_item": "Pedra em Formato de Batata", "tipo_item": "inusitado",
             "valor_item": 2, "peso_item": 1, "craftavel_item": False
         }
 
-    # ---------------- TESOUROS / ESPECIAIS ----------------
     elif nome_item == "anel_de_vida":
         item = {
-            "nome_item": "Anel de Vida", "tipo_item": "consumivel",
-            "valor_item": 100, "peso_item": 0.1, "cura_vida_item": 999,
+            "nome_item": "Anel de Vida", "tipo_item": "armadura", "slot_item": "anel",
+            "valor_item": 70, "peso_item": 0.1, "vida_max_bonus_item": 30,
             "craftavel_item": False
         }
 
     return item
 
 
-# Mapeia o tipo_item interno (usado na lógica) para uma categoria mais curta,
-# usada só na exibição da tela de inventário.
 CATEGORIAS_EXIBICAO = {
     "arma": "Equipamento",
     "armadura": "Equipamento",
@@ -537,7 +478,6 @@ CATEGORIAS_EXIBICAO = {
     "nenhum": "-",
 }
 
-# Descrição de cada item, mostrada no painel de detalhes do inventário.
 DESCRICOES_ITENS = {
     "espada_de_madeira": "Uma espada simples de madeira. Fraca, mas fácil de fabricar.",
     "adaga_cega": "Uma adaga velha e sem fio. Rápida, mas causa pouco dano.",
@@ -552,6 +492,7 @@ DESCRICOES_ITENS = {
     "botas_de_couro": "Botas leves de couro. Ocupa o slot de botas.",
     "escudo_de_madeira": "Escudo simples de madeira, ajuda a bloquear golpes. Ocupa o slot de escudo.",
     "anel_de_cura": "Um anel abençoado. Enquanto equipado, aumenta sua defesa e sua vida máxima. Ocupa o slot de anel.",
+    "anel_de_vida": "Um anel raro. Enquanto equipado, aumenta bastante sua vida máxima. Ocupa o slot de anel.",
     "pocao_de_cura_pequena": "Poção que restaura uma pequena quantidade de vida ao ser consumida.",
     "pocao_de_cura_grande": "Poção que restaura uma grande quantidade de vida ao ser consumida.",
     "pocao_de_mana_pequena": "Poção que restaura uma pequena quantidade de mana ao ser consumida.",
@@ -572,7 +513,6 @@ DESCRICOES_ITENS = {
     "folha_venenosa": "Folha tóxica, usada para preparar antídotos.",
     "asa_de_morcego": "Asa de morcego, ingrediente usado em algumas fabricações.",
     "pedra_batata": "Uma pedra que parece estranhamente com uma batata. Não serve pra nada.",
-    "anel_de_vida": "Um anel raro e poderoso, cura quase toda a vida ao ser consumido.",
 }
 
 
@@ -584,7 +524,7 @@ def obter_descricao_item(nome_item, item):
     return DESCRICOES_ITENS.get(nome_item, f"Um {item['nome_item']}, sem descrição detalhada.")
 
 
-def calcular_peso_inventario(): # Soma o peso_item de cada item do inventário pela quantidade
+def calcular_peso_inventario():
     total = 0
     for nome_item, quantidade in inventario.items():
         item = itens_jogo(nome_item)
@@ -592,11 +532,11 @@ def calcular_peso_inventario(): # Soma o peso_item de cada item do inventário p
     return total
 
 
-def calcular_total_itens_inventario(): # Soma a QUANTIDADE de cada item, não a quantidade de tipos diferentes
+def calcular_total_itens_inventario():
     return sum(inventario.values())
 
 
-def pesquisar_item_por_tipo(tipo): # Retorna só os itens do inventário daquele tipo_item
+def pesquisar_item_por_tipo(tipo):
     encontrados = {}
     for nome_item, quantidade in inventario.items():
         item = itens_jogo(nome_item)
@@ -618,7 +558,7 @@ def musica():
     elif sistema == "Linux":
         os.system("aplay musica.wav")
 
-def ordenar_inventario_por(criterio): # criterio: "tipo_item", "valor_item" ou "peso_item"
+def ordenar_inventario_por(criterio):
     global inventario
     inventario = dict(
         sorted(inventario.items(), key=lambda par: itens_jogo(par[0]).get(criterio, ""))
@@ -631,9 +571,6 @@ def pode_consumir_item(nome_item):
 
 
 def buscar_item_inventario_por_nome(nome_digitado):
-    """Permite localizar um item do inventário pelo NOME DE EXIBIÇÃO
-    (ex: 'Bagas Vermelhas Silvestres'), em vez da chave interna (ex: 'bagas_vermelhas').
-    Retorna a chave interna do item, ou None se não encontrar nada com esse nome no inventário."""
     nome_normalizado = nome_digitado.strip().lower()
     for chave in inventario:
         if itens_jogo(chave)["nome_item"].strip().lower() == nome_normalizado:
@@ -642,9 +579,6 @@ def buscar_item_inventario_por_nome(nome_digitado):
 
 
 def resolver_id_item(id_digitado):
-    """Resolve um ID digitado (ex: '01' ou '1') para a chave interna do item,
-    de acordo com a ordem atual de exibição do inventário. Retorna None se o
-    ID não existir."""
     try:
         indice = int(id_digitado)
     except ValueError:
@@ -657,19 +591,12 @@ def resolver_id_item(id_digitado):
 
 
 def item_esta_equipado(nome_item):
-    """Checa se um item (arma ou peça de armadura/acessório) está equipado agora."""
     if nome_item == arma_equipada:
         return True
     return nome_item in equipamento_armadura.values()
 
 
 def equipar_item(nome_item, armadura_atual, vida=None, vida_maxima=None):
-    """Equipa uma arma (soma o dano dela ao ataque base) ou uma peça de
-    armadura/acessório (ocupa o slot dela e soma a defesa; se o item tiver
-    'vida_max_bonus_item', também ajusta a vida máxima do jogador na hora).
-    Se o item escolhido JÁ estiver equipado, essa mesma ação o DESEQUIPA
-    (efeito de alternar/toggle), desfazendo também o bônus de vida máxima.
-    Retorna (armadura_atualizada, vida, vida_maxima, mensagem)."""
     global arma_equipada
     item = itens_jogo(nome_item)
 
@@ -713,7 +640,6 @@ def equipar_item(nome_item, armadura_atual, vida=None, vida_maxima=None):
 
         texto_vida = ""
         if vida_maxima is not None:
-            # remove o bônus do item anterior (se houver) e aplica o do novo
             if bonus_vida_max_anterior:
                 vida_maxima = max(1, vida_maxima - bonus_vida_max_anterior)
             if bonus_vida_max:
@@ -731,9 +657,6 @@ def equipar_item(nome_item, armadura_atual, vida=None, vida_maxima=None):
 
 
 def desequipar_tudo(armadura_atual, vida=None, vida_maxima=None):
-    """Guarda a arma e todas as peças de armadura/acessório equipadas (volta
-    pro ataque desarmado + bônus de afiar, defesa 0 e desfaz qualquer bônus
-    de vida máxima concedido por acessórios)."""
     global arma_equipada
     arma_equipada = None
 
@@ -755,11 +678,6 @@ def desequipar_tudo(armadura_atual, vida=None, vida_maxima=None):
 
 
 def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome, velocidade=None, status=None):
-    """
-    Consome um item do inventário. Retorna vida, mana, fome, velocidade, status, mensagem.
-    - nome_item: chave interna do item (já resolvida, ex: via buscar_item_inventario_por_nome).
-    - status: dict opcional {"veneno": turnos, "fogo": turnos} representando o estado do jogador.
-    """
     if status is None:
         status = {}
 
@@ -780,8 +698,6 @@ def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome, velocid
         fome = min(100, fome + item.get("fome_item", 0))
         efeitos.append(f"+{item.get('fome_item', 0)} de fome")
 
-        # Todo alimento também recupera um pouco de vida, proporcional ao quanto mata de fome
-        # (além do bônus de vida específico que alguns alimentos já tinham)
         cura_vida_total = max(1, item.get("fome_item", 0) // 4) + item.get("vida_bonus_item", 0)
         vida_antes = vida
         vida = min(vida_maxima, vida + cura_vida_total)
@@ -815,7 +731,7 @@ def consumir_item(nome_item, vida, vida_maxima, mana, mana_maxima, fome, velocid
     return vida, mana, fome, velocidade, status, mensagem
 
 
-def pode_fabricar_item(nome_item, local): # local: "mao" ou "forja"
+def pode_fabricar_item(nome_item, local):
     item = itens_jogo(nome_item)
 
     if item["nome_item"] == "Nenhum" or not item.get("craftavel_item"):
@@ -848,8 +764,6 @@ def fabricar_item(nome_item, local="mao"):
 
 
 def _texto_equipamento_armadura():
-    """Monta o texto 'slot: nome' de cada peça de armadura/acessório equipada,
-    ou 'Nenhuma' se não houver nada equipado em nenhum slot."""
     partes = []
     for slot in SLOTS_ARMADURA:
         chave = equipamento_armadura.get(slot)
@@ -859,9 +773,6 @@ def _texto_equipamento_armadura():
 
 
 def _imprimir_tabela_inventario(ouro):
-    """Desenha a tabela do inventário no estilo novo (cabeçalho, linha de ouro/peso,
-    colunas com ID, nome, categoria, quantidade e peso). Usada tanto pelo modo
-    de leitura (exibir_inventario_resumo) quanto pelo hub completo (exibir_inventario)."""
     peso_atual = calcular_peso_inventario()
     sobrecarregado = esta_sobrecarregado(peso_atual, peso_maximo_jogador)
     cor_peso = Cores.VERMELHO if sobrecarregado else Cores.RESET
@@ -894,18 +805,12 @@ def _imprimir_tabela_inventario(ouro):
 
 
 def exibir_inventario_resumo(ouro):
-    """Versão somente leitura do inventário (sem painel de ações). Usada para
-    'espiar' o inventário durante o combate ou no meio de uma pergunta
-    (sim/nao, conversar/ignorar) sem gastar o turno/ação."""
     print()
     _imprimir_tabela_inventario(ouro)
     print()
 
 
 def construir_lista_efeitos(item):
-    """Monta a lista de efeitos de um item em texto legível (ex: '+10 de fome',
-    '+2 de vida'). Usada no painel de detalhes do inventário, na listagem de
-    consumo (inventário e combate) - centraliza a descrição num único lugar."""
     efeitos = []
     if "dano_item" in item:
         efeitos.append(f"+{item['dano_item']} de dano de ataque (se equipado)")
@@ -955,9 +860,6 @@ def _exibir_detalhes_item(chave):
 
 
 def listar_itens_craftaveis(local):
-    """Retorna a lista (chave, item) de todos os itens fabricáveis num
-    determinado local ('mao' ou 'forja'), na ordem em que aparecem em
-    DESCRICOES_ITENS (que cobre todos os itens do jogo)."""
     resultado = []
     for chave in DESCRICOES_ITENS:
         item = itens_jogo(chave)
@@ -967,8 +869,6 @@ def listar_itens_craftaveis(local):
 
 
 def _linha_status_receita(chave, item):
-    """Retorna (tag_status, texto_da_receita) de um item craftável, indicando
-    se o jogador já tem os materiais necessários ou não."""
     pode, _ = pode_fabricar_item(chave, item.get("local_fabricacao_item", "mao"))
     status = f"{Cores.VERDE}[OK]{Cores.RESET}" if pode else f"{Cores.VERMELHO}[FALTAM MATERIAIS]{Cores.RESET}"
     receita = ", ".join(
@@ -979,10 +879,6 @@ def _linha_status_receita(chave, item):
 
 
 def exibir_menu_fabricacao_mao():
-    """Mostra os itens fabricáveis na mão (o jogador pode escolher um pra
-    fabricar aqui mesmo) e, abaixo, só como referência, os que existem no jogo
-    mas exigem a forja de Gol. Retorna a lista (chave, item) dos itens de mão,
-    na ordem exibida, pra permitir escolher pelo número mostrado."""
     itens_mao = listar_itens_craftaveis("mao")
     itens_forja = listar_itens_craftaveis("forja")
 
@@ -1008,23 +904,10 @@ def exibir_menu_fabricacao_mao():
 
 
 def aguardar_continuar():
-    """Pausa a execução até o jogador apertar ENTER. Necessário porque a tela
-    do inventário limpa a cada repetição do menu - sem essa pausa, mensagens
-    e telas informativas (como os detalhes de um item) seriam apagadas antes
-    do jogador conseguir ler."""
     input(f"\n{Cores.CIANO}[Pressione ENTER para continuar]{Cores.RESET}")
 
 
 def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, armadura, ouro):
-    """
-    Hub completo do inventário, no novo layout com ID por item (01, 02...) e
-    painel de ações numerado (1 a 8). Permite: usar/consumir, fabricar na mão,
-    descartar, ordenar/filtrar, ver detalhes, equipar (arma/armadura), buscar
-    por tipo e sair. Fabricação em forja continua exigindo estar na forja
-    (ver forja_interativa). Retorna vida, vida_maxima, mana, fome, velocidade,
-    armadura atualizados, já que usar/equipar itens pode alterá-los (inclusive
-    a vida máxima, no caso de acessórios como o Anel de Cura).
-    """
     while True:
         limpar()
         print()
@@ -1038,7 +921,6 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
 ================================================================================""")
         escolha = input(" Digite a opção desejada ou ID do item: ").strip().lower()
 
-        # Digitar direto o ID do item (ex: 01) já mostra os detalhes dele
         if escolha.isdigit() and 1 <= int(escolha) <= len(inventario) and len(escolha) >= 2:
             chave = resolver_id_item(escolha)
             if chave:
@@ -1112,11 +994,8 @@ def exibir_inventario(vida, vida_maxima, mana, mana_maxima, fome, velocidade, ar
                 inventario[chave] -= 1
                 if inventario[chave] <= 0:
                     del inventario[chave]
-                # se o item descartado estava equipado, ele é automaticamente desequipado
                 recalcular_ataque()
                 armadura = recalcular_armadura()
-                # corrige o bug de descartar um acessório equipado (ex: Anel de Cura)
-                # deixar a vida máxima inflada para sempre
                 if estava_equipado and bonus_vida_max:
                     vida_maxima = max(1, vida_maxima - bonus_vida_max)
                     vida = min(vida, vida_maxima)
@@ -1204,7 +1083,6 @@ def exibir_status(nome_usuario,vida,defesa,velocidade,mana,items_no_inv,fase,rac
 """) 
 
 def exibir_barra_status(vida, vida_maxima, fome, mana=None, mana_maxima=None):
-    """Mostra rapidamente vida, mana e fome do jogador, chamado ao final de cada fase."""
     cor_vida = Cores.VERDE if vida > vida_maxima * 0.3 else Cores.VERMELHO
     cor_fome = Cores.RESET if fome > 20 else Cores.VERMELHO
     texto_mana = ""
@@ -1214,8 +1092,6 @@ def exibir_barra_status(vida, vida_maxima, fome, mana=None, mana_maxima=None):
 
 
 def exibir_rodape_fase():
-    """Rodapé fixo mostrado nas telas de fase, lembrando o jogador do que ele
-    pode fazer sem precisar consultar o /help toda hora."""
     print(f"{Cores.CIANO}[ENTER] Continuar   [/inv] Inventário   [/sts] Status   [/help] Ajuda{Cores.RESET}")
 
 def exibir_raca(raca_personagem):
@@ -1223,7 +1099,7 @@ def exibir_raca(raca_personagem):
 
 def definir_atributos(raca):
     if raca == "Humano":
-        return 100, 15, 20, 0 # vida, defesa, velocidade, mana
+        return 100, 15, 20, 0
     elif raca == "Elfo":
         return 85, 9, 25, 60
     elif raca == "Anao":
@@ -1236,9 +1112,6 @@ def definir_atributos(raca):
         return 100, 10, 10, 0
 
 
-# Capacidade de peso máxima de cada raça, em kg. Baseada nos atributos de cada
-# raça: quem tem mais defesa/vida (corpo mais robusto) aguenta mais peso,
-# quem tem mais velocidade (corpo mais leve/ágil) aguenta menos.
 PESO_MAXIMO_RACA = {
     "Humano": 40,
     "Elfo": 34,
@@ -1247,10 +1120,8 @@ PESO_MAXIMO_RACA = {
     "Draconato": 46,
 }
 
-# Percentual de penalidade quando o jogador está acima do peso máximo:
-# a velocidade (usada para fugir) e o ataque (usado para calcular dano) caem.
-PENALIDADE_VELOCIDADE_SOBRECARGA = 0.6  # fica com 60% da velocidade
-PENALIDADE_ATAQUE_SOBRECARGA = 0.8      # fica com 80% do ataque
+PENALIDADE_VELOCIDADE_SOBRECARGA = 0.6
+PENALIDADE_ATAQUE_SOBRECARGA = 0.8
 
 
 def definir_peso_maximo(raca):
@@ -1262,10 +1133,6 @@ def esta_sobrecarregado(peso_atual, peso_maximo):
 
 
 def aplicar_penalidade_peso(velocidade, ataque):
-    """Recebe velocidade/ataque base e retorna os valores efetivos, já considerando
-    a sobrecarga (se o peso do inventário estiver acima do peso máximo da raça).
-    Não altera a velocidade/ataque base do jogador - é só um efeito temporário
-    enquanto ele estiver carregando peso demais."""
     peso_atual = calcular_peso_inventario()
     if esta_sobrecarregado(peso_atual, peso_maximo_jogador):
         velocidade_efetiva = max(1, int(velocidade * PENALIDADE_VELOCIDADE_SOBRECARGA))
@@ -1287,7 +1154,6 @@ def exibir_tabeal_raca():
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
            """)
 
-# Monstros que o jogador NÃO consegue fugir (mini-bosses e boss final).
 BOSSES_SEM_FUGA = {
     "urso_de_pedra",
     "dragao_negro_jovem",
@@ -1297,8 +1163,7 @@ BOSSES_SEM_FUGA = {
     "lorde_loop_f2",
 }
 
-# Monstros que roubam vida do jogador ao acertar um ataque (life steal).
-MONSTROS_ROUBAM_VIDA = {"morcego": 0.5}
+MONSTROS_ROUBAM_VIDA = {"morcego": 0.3}
 PORCENTAGEM_ROUBO_VIDA_PADRAO = 0.4
 
 
@@ -1314,8 +1179,6 @@ def monstros(entrada_monstro):
         "drop_moeda": 0,
         "drops_100%_monstro": []
     }
-
-    #ATO 1 - FLORESTA
 
     if entrada_monstro == "slime_verde":
         monstro = {
@@ -1402,7 +1265,6 @@ def monstros(entrada_monstro):
             "drops_100%_monstro": []
         }
 
-    #ATO 2 - MINAS 
     elif entrada_monstro == "morcego":
         monstro = {
             "nome_monstro": "Morcego Vampiro ",
@@ -1489,7 +1351,6 @@ def monstros(entrada_monstro):
             "drops_100%_monstro": []
         }
 
-    #ATO 3 - RUÍNAS ARCANAS
     elif entrada_monstro == "cultista":
         monstro = {
             "nome_monstro": "Cultista ",
@@ -1520,7 +1381,7 @@ def monstros(entrada_monstro):
         monstro = {
             "nome_monstro": "Lâmina Vazia ",
             "vida_monstro": 90,
-            "dano_monstro": 32,
+            "dano_monstro": 25,
             "velocidade_monstro": 32,
             "defesa_monstro": 10,
             "xp_monstro": 125,
@@ -1531,12 +1392,12 @@ def monstros(entrada_monstro):
     elif entrada_monstro == "mago_renegado":
         monstro = {
             "nome_monstro": "Mago Renegado ",
-            "vida_monstro": 110,
-            "dano_monstro": 28,
+            "vida_monstro": 170,
+            "dano_monstro": 34,
             "velocidade_monstro": 20,
-            "defesa_monstro": 14,
-            "xp_monstro": 140,
-            "drop_moeda": 60,
+            "defesa_monstro": 22,
+            "xp_monstro": 200,
+            "drop_moeda": 90,
             "drops_100%_monstro": []
         }
 
@@ -1552,15 +1413,13 @@ def monstros(entrada_monstro):
             "drops_100%_monstro": []
         }
 
-    #ATO 4 - CASTELLO 
-
     elif entrada_monstro == "guarda_de_ferro":
         monstro = {
             "nome_monstro": "Guarda de Ferro ",
             "vida_monstro": 220,
-            "dano_monstro": 38,
+            "dano_monstro": 32,
             "velocidade_monstro": 12,
-            "defesa_monstro": 42,
+            "defesa_monstro": 34,
             "xp_monstro": 220,
             "drop_moeda": 80,
             "drops_100%_monstro": []
@@ -1570,7 +1429,7 @@ def monstros(entrada_monstro):
         monstro = {
             "nome_monstro": "Cavaleiro Negro ",
             "vida_monstro": 250,
-            "dano_monstro": 45,
+            "dano_monstro": 38,
             "velocidade_monstro": 20,
             "defesa_monstro": 38,
             "xp_monstro": 260,
@@ -1595,7 +1454,7 @@ def monstros(entrada_monstro):
         monstro = {
             "nome_monstro": "Feiticeiro Sombrio ",
             "vida_monstro": 180,
-            "dano_monstro": 48,
+            "dano_monstro": 38,
             "velocidade_monstro": 24,
             "defesa_monstro": 20,
             "xp_monstro": 250,
@@ -1607,7 +1466,7 @@ def monstros(entrada_monstro):
         monstro = {
             "nome_monstro": "General de Elite ",
             "vida_monstro": 280,
-            "dano_monstro": 52,
+            "dano_monstro": 42,
             "velocidade_monstro": 24,
             "defesa_monstro": 40,
             "xp_monstro": 320,
@@ -1619,15 +1478,13 @@ def monstros(entrada_monstro):
         monstro = {
             "nome_monstro": "Comandante da Guarda Real ",
             "vida_monstro": 320,
-            "dano_monstro": 55,
+            "dano_monstro": 44,
             "velocidade_monstro": 26,
             "defesa_monstro": 45,
             "xp_monstro": 350,
             "drop_moeda": 220,
             "drops_100%_monstro": []
         }
-
-    #BOSS FINAL
 
     elif entrada_monstro == "lorde_loop_f1":
         monstro = {
@@ -1654,7 +1511,6 @@ def monstros(entrada_monstro):
         }
 
     return monstro
-# FASESSS
 def exibirtxt(fase):
 
     monstro_sorteado = "nenhum"
@@ -1981,7 +1837,6 @@ Cada vez mais aparecem mais cristais, até que você vê um cristal posicionado 
 Ele é extremamente grande. Você se aproxima e um tremor acontece.
 O grande cristal se levanta e se revela como um Golem de Cristal . Você está de frente com uma montanha viva.
 """)
-        # Corrigido: essa fase não disparava o combate contra o Golem de Cristal.
         return "golem_de_cristal"
 
     if fase == 21:
@@ -2063,10 +1918,6 @@ Uma bola de fogo surge na frente do homem.
 Agora você sabe, ele é um cultista.
 A bola de fogo é disparada na sua direção e se aproxima surpreendentemente rápido...
 """)
-        # Corrigido: essa fase não disparava o combate contra o Cultista, então o
-        # jogo seguia como se a bola de fogo já tivesse acertado sem o jogador
-        # poder reagir. Agora o combate acontece normalmente, começando pelo
-        # turno do jogador (o Cultista não causa dano antes do combate começar).
         return "cultista"
 
     if fase == 27:
@@ -2476,11 +2327,7 @@ Ele joga a capa para trás e revela uma armadura pesada por baixo, junto com uma
 
     return monstro_sorteado
 
-def calcular_dano(ataque, defesa, chance_critico=0.2, multiplicador_critico=1.8):
-    """
-    Calcula o dano de um golpe considerando a defesa de quem apanha
-    e uma chance de crítico. Retorna (dano, foi_critico).
-    """
+def calcular_dano(ataque, defesa, chance_critico=0.1, multiplicador_critico=1.8):
     base = max(2, ataque - defesa // 3)
     variacao = random.randint(-1, 4)
     dano = max(2, base + variacao)
@@ -2492,19 +2339,19 @@ def calcular_dano(ataque, defesa, chance_critico=0.2, multiplicador_critico=1.8)
     return dano, critico
 
 
+def chance_de_acerto(velocidade_atacante, velocidade_alvo):
+    diferenca = velocidade_atacante - velocidade_alvo
+    chance = 0.85 + diferenca * 0.01
+    return max(0.55, min(0.95, chance))
+
+
 def aplicar_reducao_anao(dano, raca_personagem):
-    """Aplica o buff racial do Anão (5% de redução de dano recebido) a
-    qualquer fonte de dano direto - combate, armadilhas, armadilhas etc."""
     if raca_personagem == "Anao":
         return max(1, int(dano * 0.95))
     return dano
 
 
 def verificar_level_up(xp, nivel, vida, vida_maxima):
-    """A cada 100 de XP acumulado, o jogador sobe de nível e fica mais forte.
-    Corrigido: subir de nível aumenta a vida máxima, mas NÃO cura o jogador
-    por completo sozinho - a vida atual sobe pela mesma quantidade que a
-    vida máxima (ex: +15/+15), preservando o dano que ele já tinha sofrido."""
     while xp >= 100:
         xp -= 100
         nivel += 1
@@ -2515,7 +2362,6 @@ def verificar_level_up(xp, nivel, vida, vida_maxima):
 
 
 def perder_fome(fome, quantidade, vida):
-    """Reduz a fome do jogador. Se a fome chegar a zero, o jogador começa a perder vida."""
     fome = max(0, fome - quantidade)
     if fome == 0:
         vida = max(0, vida - 3)
@@ -2526,11 +2372,6 @@ def perder_fome(fome, quantidade, vida):
 
 
 def aplicar_status_efeitos_fora_combate(vida):
-    """Aplica, UMA rodada por vez, os efeitos de status de longa duração do
-    jogador (ex: veneno de armadilhas) acumulados em status_efeitos_jogador.
-    Chamada uma vez a cada fase que avança, para o dano ser distribuído ao
-    longo do tempo em vez de aplicado tudo de uma vez só (bug corrigido).
-    Retorna a vida atualizada."""
     global status_efeitos_jogador
     if "veneno" in status_efeitos_jogador and vida > 0:
         dano_veneno = random.randint(3, 6)
@@ -2544,8 +2385,6 @@ def aplicar_status_efeitos_fora_combate(vida):
 
 
 def afiar_espada():
-    """Aumenta permanentemente o dano de ataque do jogador (bônus que persiste
-    mesmo trocando de arma depois)."""
     global bonus_afiar
     bonus = 3
     bonus_afiar += bonus
@@ -2554,12 +2393,6 @@ def afiar_espada():
 
 
 def vender_interativo(ouro, vida=None, vida_maxima=None):
-    """Sub-menu de venda: mostra os itens do inventário com o preço de venda de cada um
-    e pede ao jogador o NOME do item que deseja vender. Retorna (ouro, vida, vida_maxima)
-    atualizados. Se o item vendido estiver equipado, ele é automaticamente desequipado
-    (arma, armadura ou acessório); se ele dava bônus de vida máxima (ex: Anel de Cura),
-    esse bônus também é removido agora - corrige o bug em que vender um acessório
-    equipado deixava a vida máxima artificialmente alta para sempre."""
     while True:
         if not inventario:
             print(f"{Cores.VERMELHO}Você não possui itens para vender.{Cores.RESET}")
@@ -2588,8 +2421,6 @@ def vender_interativo(ouro, vida=None, vida_maxima=None):
         inventario[chave] -= 1
         if inventario[chave] <= 0:
             del inventario[chave]
-        # corrige o bug de um item vendido continuar "equipado": desequipa
-        # automaticamente a arma/armadura/acessório se ela não estiver mais no inventário
         sincronizar_equipamentos()
         if estava_equipado and bonus_vida_max and vida_maxima is not None:
             vida_maxima = max(1, vida_maxima - bonus_vida_max)
@@ -2600,9 +2431,6 @@ def vender_interativo(ouro, vida=None, vida_maxima=None):
 
 
 def loja(nome_vendedor, itens_venda, ouro, vida=None, vida_maxima=None):
-    """Loop de compra/venda de itens com um vendedor. Retorna (ouro, vida, vida_maxima)
-    atualizados (vender um acessório equipado com bônus de vida pode reduzir a vida
-    máxima - ver vender_interativo)."""
     while True:
         print(f"\n--------- LOJA DE {nome_vendedor.upper()} ---------")
         print(f" Seu ouro: {Cores.AMARELO}{ouro}{Cores.RESET}")
@@ -2652,7 +2480,6 @@ sair                 : sai da loja
 
 
 def forja_interativa():
-    """Loop de fabricação de itens de forja (ex: espada_de_ferro) na forja de Gol."""
     itens_forja = listar_itens_craftaveis("forja")
     largura = 80
 
@@ -2684,8 +2511,6 @@ def forja_interativa():
 
 
 def resolver_baus_gollum(ouro, vida):
-    """Minigame dos três baús de Gollum. Cada baú 'fala' uma frase - só um diz a verdade.
-    Retorna (ouro, vida) atualizados."""
     baus = ["1", "2", "3"]
     correto = random.choice(baus)
 
@@ -2734,14 +2559,6 @@ Apenas UM dos baús disse a verdade sobre si mesmo. Escolha com sabedoria!
 def perguntar_opcao(pergunta, opcao_positiva, opcao_negativa, vida=0, vida_maxima=0, mana=0,
                      mana_maxima=0, fome=0, ouro=0, xp=0, nivel=0, nome_usuario="", raca_personagem="",
                      armadura=0, defesa=0, velocidade=0, fase=0, texto_fase=""):
-    """
-    Pergunta algo ao jogador aceitando apenas opcao_positiva ou opcao_negativa (ex: "sim"/"nao",
-    "conversar"/"ignorar"). Enquanto a resposta não for uma dessas duas opções, o jogador pode
-    espiar /inv, /sts ou /help sem que isso conte como resposta - corrige o bug em que digitar um
-    comando durante essas perguntas era tratado como "não"/"ignorar".
-    texto_fase: o texto narrativo já exibido nesta fase, para ser reimpresso sempre que a tela
-    for limpa por um comando, evitando que o jogador perca o contexto (ex: a fala do vendedor).
-    """
     while True:
         resposta = input(pergunta).strip().lower()
 
@@ -2775,12 +2592,12 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
             mana, mana_maxima, fome, nome_usuario, raca_personagem, armadura, defesa):
     dados_monstro = monstros(monstro)
     vida_monstro = dados_monstro['vida_monstro']
-    vida_monstro_maxima = dados_monstro['vida_monstro']  # referência para o teto do roubo de vida
+    vida_monstro_maxima = dados_monstro['vida_monstro']
     causa_status = dados_monstro.get("causa_status")
     porcentagem_roubo_vida = MONSTROS_ROUBAM_VIDA.get(monstro)
     monstro_impede_fuga = monstro in BOSSES_SEM_FUGA
 
-    status_jogador = {}  # ex: {"veneno": turnos_restantes, "fogo": turnos_restantes, "doenca": turnos_restantes}
+    status_jogador = {}
 
     print(f"\n{Cores.CIANO}{Cores.NEGRITO}=== COMBATE: {dados_monstro['nome_monstro']} ==={Cores.RESET}")
     print(f" Vida do monstro: {vida_monstro}")
@@ -2792,11 +2609,8 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
 
     while vida_monstro > 0 and vida > 0:
 
-        # A cada turno recalcula se o jogador está sobrecarregado (o peso pode
-        # mudar em combate, já que consumir item também é permitido em batalha).
         velocidade_efetiva, ataque_efetivo, sobrecarregado = aplicar_penalidade_peso(velocidade, ataque_jogador)
 
-        #TURNO DO JOGADOR
         tags_status = ""
         if "veneno" in status_jogador:
             tags_status += f" {Cores.MAGENTA}ENVENENADO{Cores.RESET}"
@@ -2829,95 +2643,87 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
             turno_gasto = False
 
         elif escolha == "1":
-            # --- Armas de Mana: consomem mana a cada ataque, mas causam bem
-            # mais dano. Sem mana suficiente, o ataque perde o bônus da arma
-            # (fica só com o dano base + afiação). Elfos causam ainda mais
-            # dano com Armas de Mana (buff racial).
-            ataque_do_turno = ataque_efetivo
-            custo_mana_arma = 0
-            if arma_equipada is not None:
-                custo_mana_arma = itens_jogo(arma_equipada).get("custo_mana_item", 0)
-
-            if custo_mana_arma > 0:
-                if mana >= custo_mana_arma:
-                    mana -= custo_mana_arma
-                    bonus_elfo = 0
-                    if raca_personagem == "Elfo":
-                        bonus_elfo = itens_jogo(arma_equipada).get("dano_item", 0) // 2
-                        ataque_do_turno += bonus_elfo
-                    print(f"{Cores.AZUL} Sua arma de mana consome {custo_mana_arma} de mana!{Cores.RESET}")
-                    if bonus_elfo:
-                        print(f"{Cores.AZUL} Sangue élfico canaliza a mana com mais força (+{bonus_elfo} de dano)!{Cores.RESET}")
-                else:
-                    dano_arma = itens_jogo(arma_equipada).get("dano_item", 0)
-                    ataque_do_turno = max(1, ataque_efetivo - dano_arma)
-                    print(f"{Cores.AMARELO} Mana insuficiente para usar sua arma de mana! Você ataca sem o bônus mágico.{Cores.RESET}")
-
-            dano_jogador, critico_jogador = calcular_dano(ataque_do_turno, dados_monstro['defesa_monstro'])
-            vida_monstro -= dano_jogador
-
-            if critico_jogador:
-                print(f"\n{Cores.AMARELO}{Cores.NEGRITO} CRÍTICO! Você atacou e causou {dano_jogador} de dano!{Cores.RESET}")
+            chance_acerto_jogador = chance_de_acerto(velocidade_efetiva, dados_monstro['velocidade_monstro'])
+            if random.random() > chance_acerto_jogador:
+                print(f"\n{Cores.AMARELO} Você atacou, mas errou o golpe!{Cores.RESET}")
             else:
-                print(f"\n Você atacou e causou {Cores.AMARELO}{dano_jogador}{Cores.RESET} de dano!")
-            print(f" Vida do monstro: {max(vida_monstro, 0)}")
+                ataque_do_turno = ataque_efetivo
+                custo_mana_arma = 0
+                if arma_equipada is not None:
+                    custo_mana_arma = itens_jogo(arma_equipada).get("custo_mana_item", 0)
 
-            # o monstro pode te contaminar com veneno/fogo/doença ao ser atingido de perto, ou no contra-ataque
-            if causa_status and vida_monstro > 0 and random.random() < 0.35:
-                if causa_status not in status_jogador:
-                    if causa_status == "veneno":
-                        print(f"{Cores.MAGENTA} O ataque do monstro te deixou ENVENENADO!{Cores.RESET}")
-                    elif causa_status == "fogo":
-                        print(f"{Cores.VERMELHO} Você PEGOU FOGO no combate!{Cores.RESET}")
-                    elif causa_status == "doenca":
-                        print(f"{Cores.MAGENTA} A mordida do {dados_monstro['nome_monstro']}te deixou DOENTE!{Cores.RESET}")
-                status_jogador[causa_status] = 3
+                if custo_mana_arma > 0:
+                    if mana >= custo_mana_arma:
+                        mana -= custo_mana_arma
+                        bonus_elfo = 0
+                        if raca_personagem == "Elfo":
+                            bonus_elfo = itens_jogo(arma_equipada).get("dano_item", 0) // 2
+                            ataque_do_turno += bonus_elfo
+                        print(f"{Cores.AZUL} Sua arma de mana consome {custo_mana_arma} de mana!{Cores.RESET}")
+                        if bonus_elfo:
+                            print(f"{Cores.AZUL} Sangue élfico canaliza a mana com mais força (+{bonus_elfo} de dano)!{Cores.RESET}")
+                    else:
+                        dano_arma = itens_jogo(arma_equipada).get("dano_item", 0)
+                        ataque_do_turno = max(1, ataque_efetivo - dano_arma)
+                        print(f"{Cores.AMARELO} Mana insuficiente para usar sua arma de mana! Você ataca sem o bônus mágico.{Cores.RESET}")
 
-            if vida_monstro <= 0:
-                print(f"\n{Cores.VERDE}{Cores.NEGRITO} Você derrotou o {dados_monstro['nome_monstro']}!{Cores.RESET}")
-                xp_ganho = dados_monstro['xp_monstro']
-                if raca_personagem == "Goblin":
-                    # Buff racial: Goblins ganham 25% de XP a mais
-                    xp_extra = xp_ganho // 4
-                    xp_ganho += xp_extra
-                xp += xp_ganho
-                ouro += dados_monstro['drop_moeda']
-                print(f"{Cores.VERDE} +{xp_ganho} XP |  +{dados_monstro['drop_moeda']} ouro{Cores.RESET}")
+                dano_jogador, critico_jogador = calcular_dano(ataque_do_turno, dados_monstro['defesa_monstro'], chance_critico=0.1)
+                vida_monstro -= dano_jogador
 
-                for drop in dados_monstro['drops_100%_monstro']:
-                    inventario[drop] = inventario.get(drop, 0) + 1
-                    print(f"{Cores.VERDE} Você obteve: {itens_jogo(drop)['nome_item']}{Cores.RESET}")
+                if critico_jogador:
+                    print(f"\n{Cores.AMARELO}{Cores.NEGRITO} CRÍTICO! Você atacou e causou {dano_jogador} de dano!{Cores.RESET}")
+                else:
+                    print(f"\n Você atacou e causou {Cores.AMARELO}{dano_jogador}{Cores.RESET} de dano!")
+                print(f" Vida do monstro: {max(vida_monstro, 0)}")
 
-                xp, nivel, vida, vida_maxima = verificar_level_up(xp, nivel, vida, vida_maxima)
-                return vida, vida_maxima, xp, ouro, nivel, mana, fome, "venceu"
+                if causa_status and vida_monstro > 0 and random.random() < 0.35:
+                    if causa_status not in status_jogador:
+                        if causa_status == "veneno":
+                            print(f"{Cores.MAGENTA} O ataque do monstro te deixou ENVENENADO!{Cores.RESET}")
+                        elif causa_status == "fogo":
+                            print(f"{Cores.VERMELHO} Você PEGOU FOGO no combate!{Cores.RESET}")
+                        elif causa_status == "doenca":
+                            print(f"{Cores.MAGENTA} A mordida do {dados_monstro['nome_monstro']}te deixou DOENTE!{Cores.RESET}")
+                    status_jogador[causa_status] = 3
+
+                if vida_monstro <= 0:
+                    print(f"\n{Cores.VERDE}{Cores.NEGRITO} Você derrotou o {dados_monstro['nome_monstro']}!{Cores.RESET}")
+                    xp_ganho = dados_monstro['xp_monstro']
+                    if raca_personagem == "Goblin":
+                        xp_extra = xp_ganho // 4
+                        xp_ganho += xp_extra
+                    xp += xp_ganho
+                    ouro += dados_monstro['drop_moeda']
+                    print(f"{Cores.VERDE} +{xp_ganho} XP |  +{dados_monstro['drop_moeda']} ouro{Cores.RESET}")
+
+                    for drop in dados_monstro['drops_100%_monstro']:
+                        inventario[drop] = inventario.get(drop, 0) + 1
+                        print(f"{Cores.VERDE} Você obteve: {itens_jogo(drop)['nome_item']}{Cores.RESET}")
+
+                    xp, nivel, vida, vida_maxima = verificar_level_up(xp, nivel, vida, vida_maxima)
+                    return vida, vida_maxima, xp, ouro, nivel, mana, fome, "venceu"
 
         elif escolha == "2":
             if monstro_impede_fuga:
                 print(f"\n{Cores.VERMELHO} Você tenta fugir, mas {dados_monstro['nome_monstro']}é forte demais e bloqueia sua saída! Não é possível fugir deste combate.{Cores.RESET}")
-                # a tentativa falha automaticamente e gasta o turno - o monstro ataca a seguir
             else:
                 print("\n Você tenta fugir...")
 
-                # fugir também cansa e gasta fome, com ou sem sucesso
                 fome, vida = perder_fome(fome, 2, vida)
                 if vida <= 0:
                     print(f"\n{Cores.VERMELHO}{Cores.NEGRITO} Você foi consumido pelos seus ferimentos...{Cores.RESET}")
                     return vida, vida_maxima, xp, ouro, nivel, mana, fome, "morreu"
 
-                # quanto mais rápido o jogador for em relação ao monstro, maior a chance de fugir
-                # (usa a velocidade efetiva, já reduzida se o jogador estiver sobrecarregado)
                 chance_fuga = 0.5 + (velocidade_efetiva - dados_monstro['velocidade_monstro']) * 0.02
-                chance_fuga = max(0.1, min(0.9, chance_fuga))  # trava entre 10% e 90%
+                chance_fuga = max(0.1, min(0.9, chance_fuga))
 
                 if random.random() < chance_fuga:
                     print(f"{Cores.VERDE} Você conseguiu fugir!{Cores.RESET}")
                     return vida, vida_maxima, xp, ouro, nivel, mana, fome, "fugiu"
                 else:
                     print(f"{Cores.VERMELHO} Você não conseguiu fugir!{Cores.RESET}")
-                    # a fuga falhou, o monstro ataca normalmente abaixo
 
         elif escolha == "3":
-            # Usar um item NUNCA gasta o turno - o jogador pode consumir e ainda agir na sequência.
             turno_gasto = False
             itens_consumiveis = {n: q for n, q in inventario.items() if pode_consumir_item(n)}
             if not itens_consumiveis:
@@ -2968,7 +2774,6 @@ Velocidade:....{velocidade}
         else:
             print(f"{Cores.VERMELHO}Opção inválida. Você perdeu o turno.{Cores.RESET}")
 
-        #EFEITOS DE STATUS (veneno / fogo / doença) - dano por rodada
         if turno_gasto and vida > 0:
             if "veneno" in status_jogador:
                 dano_veneno = random.randint(3, 6)
@@ -2992,7 +2797,6 @@ Velocidade:....{velocidade}
                 dano_doenca = random.randint(2, 5)
                 vida = max(0, vida - dano_doenca)
                 status_jogador["doenca"] -= 1
-                # a doença também rouba vida para o monstro que a causou (ex: Rato Gigante)
                 if vida_monstro > 0:
                     vida_monstro = min(vida_monstro_maxima, vida_monstro + dano_doenca)
                     print(f"{Cores.MAGENTA} A doença consome {dano_doenca} da sua vida e fortalece o {dados_monstro['nome_monstro']}! (Vida: {vida} | Vida do monstro: {vida_monstro}){Cores.RESET}")
@@ -3006,30 +2810,32 @@ Velocidade:....{velocidade}
                 print(f"\n{Cores.VERMELHO}{Cores.NEGRITO} Você foi consumido pelos seus ferimentos...{Cores.RESET}")
                 return vida, vida_maxima, xp, ouro, nivel, mana, fome, "morreu"
 
-        #TURNO DO MONSTRO
         if turno_gasto and vida_monstro > 0 and vida > 0:
             fome, vida = perder_fome(fome, 1, vida)
             if vida <= 0:
                 return vida, vida_maxima, xp, ouro, nivel, mana, fome, "morreu"
 
-            dano_monstro, critico_monstro = calcular_dano(dados_monstro['dano_monstro'], defesa_total, chance_critico=0.12)
-            if raca_personagem == "Anao":
-                # Buff racial: Anões recebem 5% a menos de dano
-                dano_monstro = max(1, int(dano_monstro * 0.95))
-            vida -= dano_monstro
-            if vida < 0:
-                vida = 0
+            chance_acerto_monstro = chance_de_acerto(dados_monstro['velocidade_monstro'], velocidade_efetiva)
+            if random.random() > chance_acerto_monstro:
+                print("\n--- Turno do monstro ---")
+                print(f"{Cores.VERDE} O {dados_monstro['nome_monstro']} atacou, mas errou o golpe!{Cores.RESET}")
+            else:
+                dano_monstro, critico_monstro = calcular_dano(dados_monstro['dano_monstro'], defesa_total, chance_critico=0.08)
+                if raca_personagem == "Anao":
+                    dano_monstro = max(1, int(dano_monstro * 0.95))
+                vida -= dano_monstro
+                if vida < 0:
+                    vida = 0
 
-            print("\n--- Turno do monstro ---")
-            if critico_monstro:
-                print(f"{Cores.VERMELHO}{Cores.NEGRITO} O {dados_monstro['nome_monstro']} acertou um CRÍTICO em você!{Cores.RESET}")
-            print(f" O {dados_monstro['nome_monstro']} te ataca e causa {Cores.VERMELHO}{dano_monstro}{Cores.RESET} de dano!")
+                print("\n--- Turno do monstro ---")
+                if critico_monstro:
+                    print(f"{Cores.VERMELHO}{Cores.NEGRITO} O {dados_monstro['nome_monstro']} acertou um CRÍTICO em você!{Cores.RESET}")
+                print(f" O {dados_monstro['nome_monstro']} te ataca e causa {Cores.VERMELHO}{dano_monstro}{Cores.RESET} de dano!")
 
-            # Roubo de vida: alguns monstros (ex: morcego) recuperam parte do dano causado
-            if porcentagem_roubo_vida:
-                vida_roubada = max(1, int(dano_monstro * porcentagem_roubo_vida))
-                vida_monstro = min(vida_monstro_maxima, vida_monstro + vida_roubada)
-                print(f"{Cores.MAGENTA} O {dados_monstro['nome_monstro']} suga {vida_roubada} de vida de você! (Vida do monstro: {vida_monstro}){Cores.RESET}")
+                if porcentagem_roubo_vida:
+                    vida_roubada = max(1, int(dano_monstro * porcentagem_roubo_vida))
+                    vida_monstro = min(vida_monstro_maxima, vida_monstro + vida_roubada)
+                    print(f"{Cores.MAGENTA} O {dados_monstro['nome_monstro']} suga {vida_roubada} de vida de você! (Vida do monstro: {vida_monstro}){Cores.RESET}")
 
             cor_vida_jogador = Cores.VERDE if vida > vida_maxima * 0.3 else Cores.VERMELHO
             print(f" Sua vida: {cor_vida_jogador}{vida}/{vida_maxima}{Cores.RESET}")
@@ -3043,16 +2849,6 @@ Velocidade:....{velocidade}
 
 def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel,
              mana, mana_maxima, fome, nome_usuario, raca_personagem, armadura, defesa, fase, texto_fase=""):
-    """
-    Decide o que fazer com o evento retornado por exibirtxt(): pode ser um monstro
-    (entra em combate), um vendedor/forja (abre diálogo de conversar/ignorar), bagas,
-    fonte de cura, pedra de amolar, os baús de Gollum, armadilhas, achados (baú, carrinho
-    de mina, estoque de comida) ou apenas narrativa (Enter para seguir).
-    texto_fase: texto narrativo já exibido na fase, repassado para poder ser reimpresso
-    caso algum comando (/inv, /sts, /help) limpe a tela em meio a uma pergunta.
-    Retorna (vida, vida_maxima, xp, ouro, nivel, mana, fome, resultado),
-    onde resultado é "ok" ou "morreu".
-    """
     global status_efeitos_jogador, bonus_defesa_eventos, bonus_velocidade_eventos, pacto_feito
 
     eventos_vendedor = {
@@ -3062,7 +2858,6 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
         "vendedor_othon": ("Othon", ITENS_OTHON, False),
     }
 
-    # atalho para chamar perguntar_opcao já passando todo o estado atual do jogador
     def pergunta(texto, opcao_pos, opcao_neg):
         return perguntar_opcao(
             texto, opcao_pos, opcao_neg,
@@ -3140,10 +2935,6 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
         return vida, vida_maxima, xp, ouro, nivel, mana, fome, resultado_batalha
 
     elif evento == "armadilha_dardo":
-        # Corrigido: o dano inicial do dardo é imediato, mas o VENENO agora é
-        # registrado como status de longa duração e aplicado UMA rodada por
-        # fase (ver aplicar_status_efeitos_fora_combate), em vez de aplicar
-        # de uma vez só as 3 rodadas de dano dentro desta mesma função.
         dano = aplicar_reducao_anao(random.randint(15, 25), raca_personagem)
         vida = max(0, vida - dano)
         print(f"{Cores.VERMELHO} O dardo perfura sua pele e injeta veneno! Você sofre {dano} de dano imediato.{Cores.RESET}")
@@ -3204,10 +2995,6 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
         else:
             print(f"Você ignora {nome_vendedor} e segue em frente.")
 
-    # Para fases puramente narrativas (sem escolha própria), não pedimos mais um
-    # input extra aqui — o prompt "->" logo depois já serve para o jogador seguir
-    # em frente, corrigindo o bug de precisar apertar Enter duas vezes.
-
     return vida, vida_maxima, xp, ouro, nivel, mana, fome, "ok"
 
 
@@ -3217,21 +3004,16 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
     limpar()
     inicio_sessao = time.time()
 
-    # vida e mana no momento em que o jogo começa viram o "máximo"
     vida_maxima = vida
     mana_maxima = mana
 
-    # peso máximo que o jogador consegue carregar, de acordo com a raça escolhida
     peso_maximo_jogador = definir_peso_maximo(raca_personagem)
 
-    # reseta os status de longa duração e os bônus de eventos ao começar uma nova aventura
     status_efeitos_jogador = {}
     bonus_defesa_eventos = 0
     bonus_velocidade_eventos = 0
     pacto_feito = False
 
-    # o jogador já começa com a Espada de Madeira, o Capacete de Couro e o
-    # Peitoral de Couro equipados, já que eles vêm no inventário inicial
     arma_equipada = "espada_de_madeira" if "espada_de_madeira" in inventario else None
     for slot in equipamento_armadura:
         equipamento_armadura[slot] = None
@@ -3244,18 +3026,13 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
 
     print(f"--- INICIANDO A AVENTURA DE {nome_usuario.upper()} ---")
     while True:
-        # Limpa a tela no início de cada fase, para não ficar acumulando o texto
-        # de todas as fases anteriores na tela junto com a fase atual.
         limpar()
 
-        # Chama exibirtxt UMA ÚNICA vez, capturando o texto impresso para poder
-        # reexibi-lo caso algum comando limpe a tela durante esta mesma fase
-        # (corrige o bug de perder o texto da fase ao usar /inv, /sts, etc).
         buffer_fase = io.StringIO()
         with contextlib.redirect_stdout(buffer_fase):
             evento = exibirtxt(fase)
         texto_fase = buffer_fase.getvalue()
-        print(texto_fase, end="")
+        escrever_com_efeito(texto_fase)
 
         defesa_total = armadura + defesa + bonus_defesa_eventos
         velocidade_total = velocidade + bonus_velocidade_eventos
@@ -3282,15 +3059,9 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
             print(f"XP final alcançado: {xp}/100")
             break
 
-        # Mostra vida, mana e fome resumidas assim que o jogador ganha o controle nesta fase
         exibir_barra_status(vida, vida_maxima, fome, mana, mana_maxima)
         exibir_rodape_fase()
 
-        # Loop de comandos dentro da MESMA fase: o jogador pode usar /inv, /sts, etc
-        # livremente sem que isso avance a fase. A fase só avança quando o jogador
-        # de fato escolhe seguir em frente, pressionando Enter (entrada vazia).
-        # Sempre que um comando precisar limpar a tela, o texto da fase (texto_fase)
-        # é reimpresso na sequência, para o jogador não perder o contexto da história.
         avancar_fase = False
         sair_do_jogo = False
 
@@ -3330,8 +3101,6 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
                 exibir_rodape_fase()
 
             elif entrada == "/clear":
-                # /clear é um pedido explícito de limpar a tela, então aqui não
-                # reimprimimos o texto da fase - é essa a diferença para os outros comandos.
                 limpar()
                 os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -3382,17 +3151,12 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
             print(f"XP final alcançado: {xp}/100")
             break
 
-        # Só chega aqui quando o jogador pressionou Enter vazio: a fase avança de fato.
         fase += 1
         fome, vida = perder_fome(fome, 2, vida)
 
-        # Aplica UMA rodada dos status de longa duração (ex: veneno de armadilha),
-        # distribuindo o dano ao longo das fases em vez de tudo de uma vez.
         if vida > 0:
             vida = aplicar_status_efeitos_fora_combate(vida)
 
-        # Regeneração passiva de vida por fase: Draconato regenera 1 de vida por
-        # fase (buff racial); o Pacto da fase 35 soma mais (1, ou 2 se Draconato).
         if vida > 0:
             regen_vida = 0
             if raca_personagem == "Draconato":
@@ -3402,7 +3166,6 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
             if regen_vida > 0:
                 vida = min(vida_maxima, vida + regen_vida)
 
-        # Mana regenera 5 por fase (só faz sentido para quem tem mana máxima > 0)
         if mana_maxima > 0:
             mana = min(mana_maxima, mana + 5)
 
@@ -3456,7 +3219,7 @@ Parabéns, {nome_usuario}! Você concluiu THE INFINITE LOOP!
 
     return fase
 
-def main(): # Parte do menu
+def main():
     limpar()
     menu()
     
