@@ -544,20 +544,6 @@ def pesquisar_item_por_tipo(tipo):
             encontrados[nome_item] = quantidade
     return encontrados
 
-def musica():
-    sistema = platform.system()
-
-    if sistema == "Windows":
-        import winsound
-
-        winsound.PlaySound("musica.wav", winsound.SND_FILENAME)
-
-    elif sistema == "Darwin":
-        os.system("afplay musica.wav")
-
-    elif sistema == "Linux":
-        os.system("aplay musica.wav")
-
 def ordenar_inventario_por(criterio):
     global inventario
     inventario = dict(
