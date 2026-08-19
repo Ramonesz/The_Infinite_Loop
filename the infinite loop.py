@@ -117,12 +117,29 @@ ca para Internet. O jogo foi inspirado em RPGs de texto (Text-based RPG), especi
      
 
 BUFFS_RACA = {
-    "Humano": "Nenhum bônus especial",
+    "Humano": "+40% de XP ganho",
     "Elfo": "Mais dano com Armas de Mana",
     "Anao": "5% de redução de dano recebido",
-    "Goblin": "+25% de XP ganho",
-    "Draconato": "Regenera 1 de vida por fase",
+    "Goblin": "+30% de ouro ganho",
+    "Draconato": "Regenera 1 de vida por fase (e por round de batalha)",
 }
+
+BONUS_OURO_RACA = {"Goblin": 0.30}
+BONUS_XP_RACA = {"Humano": 0.40}
+
+
+def aplicar_bonus_ouro_raca(ouro_ganho, raca_personagem):
+    bonus = BONUS_OURO_RACA.get(raca_personagem, 0)
+    if bonus and ouro_ganho > 0:
+        return ouro_ganho + int(ouro_ganho * bonus)
+    return ouro_ganho
+
+
+def aplicar_bonus_xp_raca(xp_ganho, raca_personagem):
+    bonus = BONUS_XP_RACA.get(raca_personagem, 0)
+    if bonus and xp_ganho > 0:
+        return xp_ganho + int(xp_ganho * bonus)
+    return xp_ganho
 
 
 def obter_raca():
@@ -131,47 +148,73 @@ def obter_raca():
                             Escolha sua raca
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--          
            |    | Raça      | vida | defesa | velocidade | mana | peso max | Buff passivo                    |
-           | [1]| Humano    |  100 |   15   |     20     |   0  |   30 kg  | Nenhum bônus especial            |
+           | [1]| Humano    |  100 |   15   |     20     |   0  |   30 kg  | +40% de XP ganho                 |
            | [2]| Elfo      |   85 |    9   |     25     |  60  |   24 kg  | Mais dano com Armas de Mana      |
            | [3]| Anao      |  130 |   24   |     12     |   0  |   42 kg  | 5% de redução de dano recebido   |
-           | [4]| Goblin    |   70 |    8   |     30     |   0  |   20 kg  | +25% de XP ganho                 |
-           | [5]| Draconato |  115 |   19   |     16     |  30  |   36 kg  | Regenera 1 de vida por fase      |
+           | [4]| Goblin    |   70 |    8   |     30     |   0  |   20 kg  | +30% de ouro ganho               |
+           | [5]| Draconato |  115 |   19   |     16     |  30  |   36 kg  | Regenera vida por fase/round     |
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
            Digite o NÚMERO da raça ou digite o nome dela.
            """)
     opcoes_numero = {"1": "Humano", "2": "Elfo", "3": "Anao", "4": "Goblin", "5": "Draconato"}
+    opcoes_nome = {nome.lower(): nome for nome in opcoes_numero.values()}
     while True:
         raca = input("->").strip().lower()
 
-        if raca in opcoes_numero:
-            raca_escolhida = opcoes_numero[raca]
+        raca_escolhida = opcoes_numero.get(raca) or opcoes_nome.get(raca)
+        if raca_escolhida:
             print(f"\nRaca escolhida: {raca_escolhida}\n")
             return raca_escolhida
 
-        elif raca=="humano":
-             print(f"\nRaca escolhida: Humano\n")
-             return "Humano"
+        print("\nRaca nao identificada, digite o numero (1 a 5) ou o nome da raca, veja a tabela a cima.\n")
 
-        elif raca=="elfo":
-             print(f"\nRaca escolhida: Elfo\n")
-             return "Elfo"
 
-        elif raca=="anao":
-             print(f"\nRaca escolhida: Anao\n")
-             return "Anao"
+SET_ESPADACHIM = {
+    "espada_de_madeira": 1, "madeira_simples": 3, "maca_crocante": 2,
+    "capacete_de_couro": 1, "armadura_de_couro": 1,
+}
+SET_MAGO = {
+    "cajado_de_aprendiz": 1, "tunica_de_pano": 1, "chapeu_de_aprendiz": 1,
+    "baga_brilhante": 3, "madeira_simples": 2,
+}
 
-        elif raca=="goblin":
-             print(f"\nRaca escolhida: Goblin\n")
-             return "Goblin"
 
-        elif raca=="draconato":
-             print(f"\nRaca escolhida: Draconato\n")
-             return "Draconato"
+def obter_set_inicial():
+    print("""
+                            Escolha seu set inicial
+           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+           | [1] Set Espadachim | Espada de Madeira, Capacete e Peitoral de Couro,
+           |                    | Maçãs Crocantes e Madeira Simples.
+           | [2] Set Mago       | Cajado de Aprendiz (arma de mana), Túnica e Chapéu
+           |                    | de Aprendiz, e Bagas Brilhantes (comida que
+           |                    | também regenera mana).
+           --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+           Digite o NÚMERO do set ou digite o nome dele.
+           """)
+    opcoes_numero = {"1": "espadachim", "2": "mago"}
+    while True:
+        escolha = input("->").strip().lower()
 
+        if escolha in opcoes_numero:
+            set_escolhido = opcoes_numero[escolha]
+        elif escolha in ("espadachim", "mago"):
+            set_escolhido = escolha
         else:
-             print("\nRaca nao identificada, digite o numero (1 a 5) ou o nome da raca, veja a tabela a cima.\n")
+            print("\nSet nao identificado, digite o numero (1 ou 2) ou o nome do set, veja as opcoes a cima.\n")
+            continue
 
-        
+        print(f"\nSet escolhido: {'Mago' if set_escolhido == 'mago' else 'Espadachim'}\n")
+        return set_escolhido
+
+
+def montar_inventario_inicial(set_escolhido):
+    global inventario
+    if set_escolhido == "mago":
+        inventario = dict(SET_MAGO)
+    else:
+        inventario = dict(SET_ESPADACHIM)
+
+
 xp = 0
 nivel = 0
 fase=1
@@ -289,6 +332,12 @@ def itens_jogo(nome_item):
             "valor_item": 90, "peso_item": 1, "dano_item": 16, "custo_mana_item": 8,
             "craftavel_item": False
         }
+    elif nome_item == "cajado_de_aprendiz":
+        item = {
+            "nome_item": "Cajado de Aprendiz", "tipo_item": "arma",
+            "valor_item": 25, "peso_item": 2, "dano_item": 9, "custo_mana_item": 6,
+            "craftavel_item": False
+        }
 
     elif nome_item == "tunica_de_pano":
         item = {
@@ -309,6 +358,12 @@ def itens_jogo(nome_item):
             "valor_item": 15, "peso_item": 1.5, "defesa_item": 4,
             "craftavel_item": True, "local_fabricacao_item": "mao",
             "receita_item": {"pele_de_lobo": 1, "teia_de_aranha": 1}
+        }
+    elif nome_item == "chapeu_de_aprendiz":
+        item = {
+            "nome_item": "Chapéu de Aprendiz", "tipo_item": "armadura", "slot_item": "capacete",
+            "valor_item": 12, "peso_item": 0.5, "defesa_item": 3,
+            "craftavel_item": False
         }
     elif nome_item == "calca_de_couro":
         item = {
@@ -485,6 +540,8 @@ DESCRICOES_ITENS = {
     "arco_de_caca": "Arco de caça leve, feito com madeira de carvalho e teia de aranha.",
     "cajado_arcano": "Arma de Mana: causa muito mais dano, mas consome mana a cada ataque.",
     "adaga_encantada": "Arma de Mana leve: dano mágico bom por um custo de mana menor.",
+    "cajado_de_aprendiz": "Arma de Mana inicial: fraca comparada a cajados avançados, mas boa para começar. Sem mana, o golpe físico é muito fraco.",
+    "chapeu_de_aprendiz": "Chapéu básico de aprendiz de mago. Ocupa o slot de capacete.",
     "tunica_de_pano": "Uma túnica simples de pano, oferece pouca proteção. Ocupa o slot de peitoral.",
     "armadura_de_couro": "Peitoral feito de pele de lobo e teia de aranha, resistente e leve. Ocupa o slot de peitoral.",
     "capacete_de_couro": "Capacete simples de couro. Ocupa o slot de capacete.",
@@ -1132,11 +1189,11 @@ def exibir_tabeal_raca():
                           Tabela de racas
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--          
            |------------  vida | defesa | velocidade | mana | Buff passivo                    |
-           | Humano    |  100  |   15   |     20     |   0  | Nenhum bônus especial            |
+           | Humano    |  100  |   15   |     20     |   0  | +40% de XP ganho                 |
            | Elfo      |   85  |    9   |     25     |  60  | Mais dano com Armas de Mana      |
            | Anao      |  130  |   24   |     12     |   0  | 5% de redução de dano recebido   |
-           | Goblin    |   70  |    8   |     30     |   0  | +25% de XP ganho                 |
-           | Draconato |  115  |   19   |     16     |  30  | Regenera 1 de vida por fase      |
+           | Goblin    |   70  |    8   |     30     |   0  | +30% de ouro ganho               |
+           | Draconato |  115  |   19   |     16     |  30  | Regenera vida por fase/round     |
            --=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
            """)
 
@@ -1174,7 +1231,7 @@ def monstros(entrada_monstro):
             "velocidade_monstro": 8,
             "defesa_monstro": 2,
             "xp_monstro": 25,
-            "drop_moeda": 5,
+            "drop_moeda": 8,
             "drops_100%_monstro": ["gelatina_verde"]
         }
 
@@ -1183,10 +1240,10 @@ def monstros(entrada_monstro):
             "nome_monstro": "Lobo Solitário ",
             "vida_monstro": 45,
             "dano_monstro": 10,
-            "velocidade_monstro": 22,
+            "velocidade_monstro": 18,
             "defesa_monstro": 4,
             "xp_monstro": 35,
-            "drop_moeda": 10,
+            "drop_moeda": 12,
             "drops_100%_monstro": ["pele_de_lobo"]
         }
 
@@ -1198,7 +1255,7 @@ def monstros(entrada_monstro):
             "velocidade_monstro": 20,
             "defesa_monstro": 3,
             "xp_monstro": 25,
-            "drop_moeda": 8,
+            "drop_moeda": 10,
             "drops_100%_monstro": [],
             "causa_status": "doenca"
         }
@@ -1211,7 +1268,7 @@ def monstros(entrada_monstro):
             "velocidade_monstro": 18,
             "defesa_monstro": 5,
             "xp_monstro": 30,
-            "drop_moeda": 15,
+            "drop_moeda": 18,
             "drops_100%_monstro": []
         }
 
@@ -1317,7 +1374,7 @@ def monstros(entrada_monstro):
             "nome_monstro": "Aranha das Cavernas ",
             "vida_monstro": 80,
             "dano_monstro": 17,
-            "velocidade_monstro": 25,
+            "velocidade_monstro": 22,
             "defesa_monstro": 10,
             "xp_monstro": 70,
             "drop_moeda": 28,
@@ -1368,7 +1425,7 @@ def monstros(entrada_monstro):
             "nome_monstro": "Lâmina Vazia ",
             "vida_monstro": 90,
             "dano_monstro": 25,
-            "velocidade_monstro": 32,
+            "velocidade_monstro": 28,
             "defesa_monstro": 10,
             "xp_monstro": 125,
             "drop_moeda": 40,
@@ -2496,7 +2553,7 @@ def forja_interativa():
         aguardar_continuar()
 
 
-def resolver_baus_gollum(ouro, vida):
+def resolver_baus_gollum(ouro, vida, raca_personagem=""):
     baus = ["1", "2", "3"]
     correto = random.choice(baus)
 
@@ -2531,7 +2588,7 @@ Apenas UM dos baús disse a verdade sobre si mesmo. Escolha com sabedoria!
         return ouro, vida
 
     if escolha == correto:
-        premio = random.randint(50, 150)
+        premio = aplicar_bonus_ouro_raca(random.randint(50, 150), raca_personagem)
         ouro += premio
         print(f"{Cores.VERDE} O baú tinha um tesouro reluzente! Você ganhou {premio} de ouro.{Cores.RESET}")
     else:
@@ -2649,9 +2706,8 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
                         if bonus_elfo:
                             print(f"{Cores.AZUL} Sangue élfico canaliza a mana com mais força (+{bonus_elfo} de dano)!{Cores.RESET}")
                     else:
-                        dano_arma = itens_jogo(arma_equipada).get("dano_item", 0)
-                        ataque_do_turno = max(1, ataque_efetivo - dano_arma)
-                        print(f"{Cores.AMARELO} Mana insuficiente para usar sua arma de mana! Você ataca sem o bônus mágico.{Cores.RESET}")
+                        ataque_do_turno = max(2, ATAQUE_BASE_DESARMADO // 3)
+                        print(f"{Cores.AMARELO} Mana insuficiente para usar sua arma de mana! Você apenas bate com o cajado no monstro, sem magia, causando pouquíssimo dano.{Cores.RESET}")
 
                 dano_jogador, critico_jogador = calcular_dano(ataque_do_turno, dados_monstro['defesa_monstro'], chance_critico=0.1)
                 vida_monstro -= dano_jogador
@@ -2674,13 +2730,11 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
 
                 if vida_monstro <= 0:
                     print(f"\n{Cores.VERDE}{Cores.NEGRITO} Você derrotou o {dados_monstro['nome_monstro']}!{Cores.RESET}")
-                    xp_ganho = dados_monstro['xp_monstro']
-                    if raca_personagem == "Goblin":
-                        xp_extra = xp_ganho // 4
-                        xp_ganho += xp_extra
+                    xp_ganho = aplicar_bonus_xp_raca(dados_monstro['xp_monstro'], raca_personagem)
+                    ouro_ganho = aplicar_bonus_ouro_raca(dados_monstro['drop_moeda'], raca_personagem)
                     xp += xp_ganho
-                    ouro += dados_monstro['drop_moeda']
-                    print(f"{Cores.VERDE} +{xp_ganho} XP |  +{dados_monstro['drop_moeda']} ouro{Cores.RESET}")
+                    ouro += ouro_ganho
+                    print(f"{Cores.VERDE} +{xp_ganho} XP |  +{ouro_ganho} ouro{Cores.RESET}")
 
                     for drop in dados_monstro['drops_100%_monstro']:
                         inventario[drop] = inventario.get(drop, 0) + 1
@@ -2716,18 +2770,20 @@ def batalha(vida, vida_maxima, defesa_total, velocidade, xp, ouro, nivel, monstr
                 print(f"{Cores.VERMELHO} Você não possui itens consumíveis no inventário.{Cores.RESET}")
             else:
                 print("\n--------- ITENS CONSUMÍVEIS ---------")
-                for nome_item_inv, quantidade in itens_consumiveis.items():
+                for indice, (nome_item_inv, quantidade) in enumerate(inventario.items(), start=1):
+                    if nome_item_inv not in itens_consumiveis:
+                        continue
                     item_inv = itens_jogo(nome_item_inv)
                     efeito_txt = ", ".join(construir_lista_efeitos(item_inv))
-                    print(f"{Cores.CIANO}{item_inv['nome_item']:<28}{Cores.RESET} x{quantidade:<3} ({efeito_txt})")
+                    print(f"[{indice:02d}] {Cores.CIANO}{item_inv['nome_item']:<28}{Cores.RESET} x{quantidade:<3} ({efeito_txt})")
                 print("-----------------------------------------")
-                nome_item_digitado = input("Qual item deseja usar? (nome do item / cancelar): ").strip()
-                if nome_item_digitado.lower() == "cancelar":
+                item_digitado = input("Qual item deseja usar? (nome ou número do item / cancelar): ").strip()
+                if item_digitado.lower() == "cancelar":
                     pass
                 else:
-                    chave = buscar_item_inventario_por_nome(nome_item_digitado)
+                    chave = resolver_id_item(item_digitado) or buscar_item_inventario_por_nome(item_digitado)
                     if chave is None:
-                        print(f"{Cores.VERMELHO} Você não possui um item chamado '{nome_item_digitado}'.{Cores.RESET}")
+                        print(f"{Cores.VERMELHO} Item '{item_digitado}' não encontrado (use o nome ou o número dele no inventário).{Cores.RESET}")
                     else:
                         vida, mana, fome, velocidade, status_jogador, mensagem = consumir_item(
                             chave, vida, vida_maxima, mana, mana_maxima, fome, velocidade, status_jogador
@@ -2795,6 +2851,17 @@ Velocidade:....{velocidade}
             if vida <= 0:
                 print(f"\n{Cores.VERMELHO}{Cores.NEGRITO} Você foi consumido pelos seus ferimentos...{Cores.RESET}")
                 return vida, vida_maxima, xp, ouro, nivel, mana, fome, "morreu"
+
+            regen_vida_round = 0
+            if raca_personagem == "Draconato":
+                regen_vida_round += 1
+            if pacto_feito:
+                regen_vida_round += 2 if raca_personagem == "Draconato" else 1
+            if regen_vida_round > 0 and vida > 0:
+                vida_antes_regen = vida
+                vida = min(vida_maxima, vida + regen_vida_round)
+                if vida > vida_antes_regen:
+                    print(f"{Cores.VERDE} Você regenera {vida - vida_antes_regen} de vida neste round! (Vida: {vida}){Cores.RESET}")
 
         if turno_gasto and vida_monstro > 0 and vida > 0:
             fome, vida = perder_fome(fome, 1, vida)
@@ -2889,7 +2956,7 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
 
     elif evento == "gollum_baus":
         if pergunta("\n Deseja conversar com Gollum? (conversar/ignorar): ", "conversar", "ignorar"):
-            ouro, vida = resolver_baus_gollum(ouro, vida)
+            ouro, vida = resolver_baus_gollum(ouro, vida, raca_personagem)
         else:
             print("Você ignora Gollum e segue em frente.")
 
@@ -2902,7 +2969,7 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
 
     elif evento == "bau_carvalho":
         if pergunta("\n O baú está apodrecido, parece fácil de arrombar. Deseja abrir? (sim/nao): ", "sim", "nao"):
-            ouro_ganho = random.randint(20, 45)
+            ouro_ganho = aplicar_bonus_ouro_raca(random.randint(20, 45), raca_personagem)
             ouro += ouro_ganho
             inventario["anel_de_vida"] = inventario.get("anel_de_vida", 0) + 1
             print(f"{Cores.VERDE} Você arromba o baú e encontra {ouro_ganho} de ouro e um Anel de Vida! {Cores.RESET}")
@@ -2938,7 +3005,7 @@ def escolhas(evento, vida, vida_maxima, defesa_total, velocidade, xp, ouro, nive
 
     elif evento == "carrinho_mina":
         if pergunta("\n Deseja vasculhar o carrinho de mina? (sim/nao): ", "sim", "nao"):
-            ouro_ganho = random.randint(15, 40)
+            ouro_ganho = aplicar_bonus_ouro_raca(random.randint(15, 40), raca_personagem)
             ouro += ouro_ganho
             inventario["minerio_de_ferro"] = inventario.get("minerio_de_ferro", 0) + 2
             print(f"{Cores.VERDE} Você encontra {ouro_ganho} de ouro e 2 Minério de Ferro dentro do carrinho!{Cores.RESET}")
@@ -3000,13 +3067,22 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
     bonus_velocidade_eventos = 0
     pacto_feito = False
 
-    arma_equipada = "espada_de_madeira" if "espada_de_madeira" in inventario else None
+    arma_equipada = None
+    for chave_arma_inicial in ("espada_de_madeira", "cajado_de_aprendiz"):
+        if chave_arma_inicial in inventario:
+            arma_equipada = chave_arma_inicial
+            break
+
     for slot in equipamento_armadura:
         equipamento_armadura[slot] = None
-    if "capacete_de_couro" in inventario:
-        equipamento_armadura["capacete"] = "capacete_de_couro"
-    if "armadura_de_couro" in inventario:
-        equipamento_armadura["peitoral"] = "armadura_de_couro"
+    for chave_capacete_inicial in ("capacete_de_couro", "chapeu_de_aprendiz"):
+        if chave_capacete_inicial in inventario:
+            equipamento_armadura["capacete"] = chave_capacete_inicial
+            break
+    for chave_peitoral_inicial in ("armadura_de_couro", "tunica_de_pano"):
+        if chave_peitoral_inicial in inventario:
+            equipamento_armadura["peitoral"] = chave_peitoral_inicial
+            break
     recalcular_ataque()
     armadura = recalcular_armadura()
 
@@ -3103,9 +3179,6 @@ def iniciar_jogo(nome_usuario, raca_personagem, vida, defesa, velocidade, mana, 
                 print(texto_fase, end="")
                 print(f'{Cores.VERMELHO}Você não pode usar o comando "/start", o jogo já iniciou!{Cores.RESET}')
                 exibir_rodape_fase()
-
-            elif entrada == "a":
-                print(fase)
 
             elif entrada == "/tabraca":
                 limpar()
@@ -3219,6 +3292,9 @@ def main():
         elif entrada == "/start":
             nome_usuario = obter_nickname()
             raca_escolhida= obter_raca()
+            set_escolhido = obter_set_inicial()
+            montar_inventario_inicial(set_escolhido)
+            items_no_inv = calcular_total_itens_inventario()
             vida,defesa,velocidade,mana=definir_atributos(raca_escolhida)
             iniciar_jogo(nome_usuario,raca_escolhida,vida,defesa,velocidade,mana,items_no_inv,fase,fome,ouro,peso,xp,nivel,armadura)
             break 
